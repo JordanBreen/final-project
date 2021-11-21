@@ -1,10 +1,11 @@
-CC=gcc -g -Wall
-CFILES= main.c sqlite_loader.c
+PROGRAM=program
+CFILES=main.c sqlite_loader.c
 OFILES=$(CFILES:.c=.o)
-main:	$(OFILES)
-	$(CC) -o main $(OFILES) -lncurses -lsqlite3 -std=c99
-main.o:
-.c.o:
-	$(CC) -c $<
+CC=gcc
+CFLAGS=-g -Wall
+
+$(PROGRAM):	$(OFILES)
+	$(CC) $(CFLAGS) -o $(PROGRAM) $(OFILES) -lm -lncurses -lsqlite3 -lpthread
+
 clean::
-	/bin/rm $(OFILES) main
+	/bin/rm $(PROGRAM) $(OFILES)
