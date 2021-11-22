@@ -1,6 +1,6 @@
 #include <locale.h>
-#include <ncurses.h>
-#include <ncurses_dll.h>
+//#include <ncurses.h>
+#include <ncursesw/ncurses.h>
 #include <sqlite3.h>
 //#include <stdio.h>
 #include <stdlib.h>
