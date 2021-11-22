@@ -1,8 +1,6 @@
 #include <locale.h>
-//#include <ncurses.h>
-#include <ncursesw/ncurses.h>
+#include <ncursesw/ncurses.h> // includes <stdio.h>
 #include <sqlite3.h>
-//#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -18,21 +16,23 @@ int main()
 {
   const char
     db_file_name[]  = "project.db",
-    db_table_name[] = "icon",
-   *header = NULL;
+    db_table_name[] = "icon";;
   icon
     *icons;
 
-  icons = (icon *)load_table(db_file_name, db_table_name, TYPE_ICON);
-
-  //for(int i = 0; i < sizeof(icons) / sizeof(icons[0]); i++)
-  //for(int i = 0; i < 5; i++)
-  //  print_icon(&icons[i], header);
-
+  fwide(stdout, 1);
   setlocale(LC_ALL, "");
+
+  int num_icons;
+  icons = (icon *)load_table(db_file_name, db_table_name, TYPE_ICON, &num_icons);
+
   initscr();
-  wchar_t wstr[] = { 9474, L'\0' };
-  mvaddwstr(0, 0, wstr);
+  for(int i = 0; i < num_icons; i++)
+  {
+    mvprintw(0, i*10, "%d", icons[i].id);
+    mvprintw(1, i*10, "%lc", icons[i].icon);
+    mvprintw(2, i*10, "%s", icons[i].name);
+  }
   refresh();
   getch();
   endwin();

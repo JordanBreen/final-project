@@ -1,10 +1,11 @@
+#include <wchar.h>
 #ifndef ICON_H
 #define ICON_H
 
 typedef struct icon {
-  int   id;
-  char  icon;
-  char *name;
+  int     id;
+  wchar_t icon;
+  char   *name;
 } icon;
 
 /*  Macros  */

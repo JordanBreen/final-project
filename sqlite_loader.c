@@ -7,29 +7,30 @@
 
 void *load_table (const char *db_file_name,
 	          const char *db_table_name,
-	          datatype    storage_datatype) {
+	          datatype    storage_datatype,
+		  int        *out_size) {
   void         *storage;
   sqlite3      *db         = NULL;
   sqlite3_stmt *res        = NULL;
-  int           table_size = 0;
   char         *err_msg    = NULL,
                 sql_query [BUFSIZ] = "SELECT * FROM ",
                 sql_size  [BUFSIZ] = "SELECT COUNT (*) FROM ";
   
   int rc, (*callback)(void *, int, char **, char **) = NULL;
+  *out_size = 0;
   db_init(&db, db_file_name, res, err_msg);
   ///////////////////////////////////////////////////////////////////////////
   strcat(sql_size,  db_table_name);
   strcat(sql_query, db_table_name);
   
-  rc = sqlite3_exec(db, sql_size, get_table_size, &table_size, &err_msg);
+  rc = sqlite3_exec(db, sql_size, get_table_size, out_size, &err_msg);
   if (rc != SQLITE_OK ) {
     fprintf(stderr, "Failed to get count from db_file: %s table: %s\n", db_file_name, db_table_name);
     fprintf(stderr, "SQL error: %s\n", err_msg);
     close_loader(err_msg, db);
     exit(1);
   }
-  alloc_storage(&storage, storage_datatype, table_size, &callback);
+  alloc_storage(&storage, storage_datatype, *out_size, &callback);
   ///////////////////////////////////////////////////////////////////////////
   rc = sqlite3_exec(db, sql_query, callback, storage, &err_msg);
   if (rc != SQLITE_OK ) {      
