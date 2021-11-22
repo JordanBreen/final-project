@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "icon.h"
+
 int init_icon (void  *ext,
                int    argc,
                char **argv,
@@ -20,10 +25,10 @@ int init_icon (void  *ext,
   return 0;
 }
 
-void print_icon (const icon ICON,
-		 const char *header) {
-  printf("icon::print_icon()  %s\n", (header) ? (header : ""));
-  printf("  id:   %d\n", ICON.id);
-  printf("  icon: %c\n", ICON.icon);
-  printf("  name: %s\n", ICON.name);
+void print_icon (const icon *icon_ptr,
+		 const char *header_str) {
+  printf("icon::print_icon()  %s\n", header_str ? header_str:"");
+  printf("  id:   %d\n", icon_ptr->id);
+  printf("  icon: \'%c\'\n", icon_ptr->icon);
+  printf("  name: \"%s\"\n", icon_ptr->name);
 }

@@ -5,9 +5,9 @@
 #include "sqlite_loader.h"
 #include "icon.h"
 
-void *load_table (char     *db_file_name,
-	          char     *db_table_name,
-	          datatype  storage_datatype) {
+void *load_table (const char *db_file_name,
+	          const char *db_table_name,
+	          datatype    storage_datatype) {
   void         *storage;
   sqlite3      *db;
   sqlite3_stmt *res;
@@ -84,6 +84,7 @@ int get_table_size (void  *ext,
   int *size = (int *)ext;
   *size = atoi(*argv);
   printf("sql_loader::get_size(): size = %d\n", *size);
+  return 0;
 }
 
 void close_loader (char *err_msg,

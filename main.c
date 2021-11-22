@@ -16,13 +16,13 @@ int main()
   const char
     db_file_name[]  = "project.db",
     db_table_name[] = "icon",
-    buffer[BUFSIZ],
    *header = NULL;
   icon
     *icons;
 
   icons = (icon *)load_table(db_file_name, db_table_name, TYPE_ICON);
 
-  for(int i = 0; i < sizeof(icons) / sizeof(icons[0]); i++)
-    print_icon(icons[i], header);
+  //for(int i = 0; i < sizeof(icons) / sizeof(icons[0]); i++)
+  for(int i = 0; i < 5; i++)
+    print_icon(&icons[i], header);
 }
