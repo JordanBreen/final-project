@@ -24,8 +24,10 @@ typedef struct icon
 //#define WALL      '#'
 
 /*  Function prototypes  */
-void InitIcons(void);
-void Draw(void);
-void FreeIcon(void);
+//void InitIcons(void);
+//void Draw(void);
+//void FreeIcon(void);
 
-#endif /* ENTITY_H */
+int init_icon(void  *ext, int argc, char **argv, char **col);
+void print_icon(const icon ICON, const char *header);
+#endif /* ICON_H */
