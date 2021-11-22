@@ -9,28 +9,15 @@ void *load_table (const char *db_file_name,
 	          const char *db_table_name,
 	          datatype    storage_datatype) {
   void         *storage;
-  sqlite3      *db;
-  sqlite3_stmt *res;
-  int           table_size;
-  char         *err_msg = NULL,
+  sqlite3      *db         = NULL;
+  sqlite3_stmt *res        = NULL;
+  int           table_size = 0;
+  char         *err_msg    = NULL,
                 sql_query [BUFSIZ] = "SELECT * FROM ",
                 sql_size  [BUFSIZ] = "SELECT COUNT (*) FROM ";
   
   int rc, (*callback)(void *, int, char **, char **) = NULL;
-  ////////////////////////////////////////////////////////////////////////////
-  rc = sqlite3_open(db_file_name, &db);
-  if(rc != SQLITE_OK) {
-    fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-    close_loader(err_msg, db);
-    exit(1);
-  }
-  ////////////////////////////////////////////////////////////////////////////
-  rc = sqlite3_prepare_v2(db, "SELECT SQLITE_VERSION()", -1, &res, 0);      
-  if (rc != SQLITE_OK) {      
-    fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
-    close_loader(err_msg, db);
-    exit(1);
-  }
+  db_init(&db, db_file_name, res, err_msg);
   ///////////////////////////////////////////////////////////////////////////
   strcat(sql_size,  db_table_name);
   strcat(sql_query, db_table_name);
@@ -91,4 +78,23 @@ void close_loader (char *err_msg,
 		   sqlite3 *db) {
   sqlite3_free(err_msg);
   sqlite3_close(db);
+}
+
+void db_init (sqlite3      **db_ptr,
+              const char    *db_file_name,
+	      sqlite3_stmt  *res,
+              char          *err_msg) {
+  int rc;
+  rc = sqlite3_open(db_file_name, db_ptr);
+  if(rc != SQLITE_OK) {
+    fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(*db_ptr));
+    close_loader(err_msg, *db_ptr);
+    exit(1);
+  }
+  rc = sqlite3_prepare_v2(*db_ptr, "SELECT SQLITE_VERSION()", -1, &res, 0);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(*db_ptr));
+    close_loader(err_msg, *db_ptr);
+    exit(1);
+  }
 }
