@@ -8,4 +8,4 @@ $(PROGRAM):	$(OFILES)
 	$(CC) $(CFLAGS) -o $(PROGRAM) $(OFILES) -lm -lform -lmenu -lpanel -lncurses -lsqlite3 -lpthread
 
 clean::
-	/bin/rm $(PROGRAM) $(OFILES)
+	/bin/rm $(PROGRAM) $(OFILES) *.*~ *.core
