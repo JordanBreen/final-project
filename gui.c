@@ -38,62 +38,46 @@ UI *create_UI() {
   int cmd_y      = log_y + log_height;
   int cmd_x      = inner_x;
 
-  ui->main_window = newwin (main_height, main_width, main_y, main_x);
-  ui->view_window = newwin (view_height, view_width, view_y, view_x);
-  ui->head_window = newwin (head_height, head_width, head_y, head_x);
-  ui->log_window  = newwin (log_height,  log_width,  log_y,  log_x );
-  ui->cmd_window  = newwin (cmd_height,  cmd_width,  cmd_y,  cmd_x );
+  ui->main_window = newwin(main_height, main_width, main_y, main_x);
+  ui->view_window = newwin(view_height, view_width, view_y, view_x);
+  ui->head_window = newwin(head_height, head_width, head_y, head_x);
+  ui->log_window  = newwin(log_height,  log_width,  log_y,  log_x );
+  ui->cmd_window  = newwin(cmd_height,  cmd_width,  cmd_y,  cmd_x );
   
-  box ( ui->main_window, 0, 0);
-  box ( ui->view_window, 0, 0);
-  box ( ui->log_window,  0, 0);
+  box(ui->main_window, 0, 0);
+  box(ui->view_window, 0, 0);
+  box(ui->log_window,  0, 0);
 
-  view_print (ui, "View Window: Offset 0\n", 0 );
-  //view_print (ui, "View Window: Offset 1", 1 );
-  head_print (ui, "Header Window"            );
-  log_print  (ui, "Log Window: Offset 0\n", 0  );
-  //log_print  (ui, "Log Window: Offset 1", 1  );
-  cmd_print  (ui, ": "                       );
+  view_window_fill (ui, '.');
+
   
-  ui_refresh(ui);
-
-  view_print (ui, "View Window: Offset 1\n", 1 );
-  log_print  (ui, "Log Window: Offset 1\n",  1 );
-
+  /*
+  head_print_str (ui, "Header Window\n");
+  log_print_str  (ui, "Log Window: \n");
+  cmd_print_str  (ui, ": ");
+  */
+  
   ui_refresh(ui);
   
   return ui;
 }
 
-void view_cursor_start (UI *ui, int *y, int *x) { getyx(ui->view_window, *y, *x); *x+=1; *y+=1; }
-void head_cursor_start (UI *ui, int *y, int *x) { getyx(ui->head_window, *y, *x); *x+=1;        }
-void log_cursor_start  (UI *ui, int *y, int *x) { getyx(ui->log_window,  *y, *x); *x+=1; *y+=1; }
-void cmd_cursor_start  (UI *ui, int *y, int *x) { getyx(ui->cmd_window,  *y, *x);               }
-
-void view_print (UI *ui, char *str, int row_offset) {
-  int x, y;
-  view_cursor_start(ui, &y, &x);
-  mvwaddstr(ui->view_window, y+row_offset, x, str);
+int  get_outer_width  ( WINDOW * win )     { return getmaxx(win) - getcurx(win); }
+int  get_outer_height ( WINDOW * win )     { return getmaxy(win) - getcury(win); }
+int  get_inner_width  ( WINDOW * win )     { return get_outer_width  (win) - 2;  }
+int  get_inner_height ( WINDOW * win )     { return get_outer_height (win) - 2;  }
+void view_window_fill ( UI * ui, char ch ) {
+  int
+    x = getbegx (ui->view_window),
+    y = getbegy (ui->view_window),
+    w  = get_inner_width (ui->view_window),
+    h = get_inner_height (ui->view_window);
+  mvwaddch (ui->view_window, --y, x, ch);
+  for (int i=y; i<=h; i++)
+    for (int j=x; j<=w; j++)
+      mvwaddch(ui->view_window, i, j, ch);
 }
-
-void head_print (UI *ui, char *str) {
-  int x, y;
-  head_cursor_start(ui, &y, &x);
-  mvwaddstr(ui->head_window, y, x, str);
-}
-
-void log_print (UI *ui, char *str, int row_offset) {
-  int x, y;
-  log_cursor_start(ui, &y, &x);
-  mvwaddstr(ui->log_window, y+row_offset, x, str);
-}
-
-void cmd_print (UI *ui, char *str) {
-  int x, y;
-  cmd_cursor_start(ui, &y, &x);
-  mvwaddstr(ui->cmd_window, y, x, str);
-}
-
+ 
 void ui_refresh (UI *ui) {
   wrefresh(ui->main_window);
   wrefresh(ui->view_window);
@@ -101,3 +85,4 @@ void ui_refresh (UI *ui) {
   wrefresh(ui->log_window);
   wrefresh(ui->cmd_window);
 }
+

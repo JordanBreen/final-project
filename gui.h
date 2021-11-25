@@ -15,14 +15,13 @@ typedef struct UI {
     max_x, max_y;
 } UI;
 
-UI * create_UI         ();
-void view_cursor_start (UI *ui, int *y, int *x);
-void head_cursor_start (UI *ui, int *y, int *x);
-void log_cursor_start  (UI *ui, int *y, int *x);
-void cmd_cursor_start  (UI *ui, int *y, int *x);
-void view_print        (UI *ui, char *str, int row_offset);
-void log_print         (UI *ui, char *str, int row_offset);
-void head_print        (UI *ui, char *str);
-void cmd_print         (UI *ui, char *str);
-void ui_refresh        (UI *ui);
+UI * create_UI        (              );
+void ui_refresh       ( UI     * ui  );
+int  get_outer_width  ( WINDOW * win );
+int  get_outer_height ( WINDOW * win );
+int  get_inner_width  ( WINDOW * win );
+int  get_inner_height ( WINDOW * win );
+void view_window_fill ( UI * ui, char ch );
+
+
 
