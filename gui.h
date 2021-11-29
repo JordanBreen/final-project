@@ -1,4 +1,5 @@
-#include <ncursesw/ncurses.h>
+//#include <ncursesw/ncurses.h>
+#include <ncurses.h>
 #include <stdarg.h>
 #include <wchar.h>
 
@@ -22,7 +23,8 @@ int  get_outer_width  ( WINDOW * win );
 int  get_outer_height ( WINDOW * win );
 int  get_inner_width  ( WINDOW * win );
 int  get_inner_height ( WINDOW * win );
-void view_window_fill ( UI * ui, wchar_t wchar );
+// void view_window_fill ( UI * ui, wchar_t wchar );
+void view_window_fill ( UI * ui, char ch );
 
 
 

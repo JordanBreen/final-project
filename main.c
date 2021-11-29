@@ -1,13 +1,7 @@
 #include <locale.h>
-// #include <ncursesw/ncurses.h> // includes <stdio.h>
-#include <sqlite3.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <form.h>
-#include <menu.h>
-#include <panel.h>
-#include <wchar.h>
 
 #include "gui.h"
 #include "icon.h"
