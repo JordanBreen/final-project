@@ -17,7 +17,12 @@ typedef enum spell_feature {
   SHAPEABLE,
   DISMISSABLE,
   MYTHIC
-}
+} spell_feature;
+typedef enum save {
+  FORT,
+  REF,
+  WILL
+} save;
 typedef struct spell {
 //type - identifier ------------- storage
   char * name;                 // string
@@ -27,7 +32,7 @@ typedef struct spell {
   char * spell_level_text;     // ptr array to 'classes'
   char * casting_time;         // struct
   char * components_text;      // text
-  //char   costly_component;   // will be determined elsewhere, skip
+  //char costly_component;     // will be determined elsewhere, skip
   char * range;                // struct, enclosing enum CLOSE, MEDIUM, LONG
   char * area;                 // struct
   char * effect;               // struct
@@ -36,7 +41,7 @@ typedef struct spell {
   char * saving_throw;         // struct
   char * description_full;     // string
   char * description_short;    // string
-  char * description_formated; // string
+  char * description_formatted;// string
   char * source;               // enum
   char * full_text;            // string
   // Components
@@ -55,7 +60,7 @@ typedef struct spell {
   
   char * descriptors;          // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
   // char * link_text;         // string, possibly skip, same as name member
-  unsigned short id;           // max 65,535 spells, expecting ~1,600 spells
+  unsigned short id;           // max 65,535 spells, expecting ~2,900 spells
   unsigned short *material_cost; // possible NULL value;
 } Spell;
 

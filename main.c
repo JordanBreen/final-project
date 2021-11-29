@@ -1,37 +1,44 @@
 #include <locale.h>
-#include <stdlib.h>
+//#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
 
-#include "gui.h"
-#include "icon.h"
-#include "sqlite_loader.h"
+//#include "gui.h"
+//#include "icon.h"
+//#include "sqlite_loader.h"
+#include "utility.h"
 
 int main()
 {
-  const char
-    db_file_name[]  = "project.db",
-    db_table_name[] = "icon";;
-  icon
-    *icons;
+  //const char
+  //  db_file_name[]  = "project.db",
+  //  db_table_name[] = "icon";
 
-  fwide(stdout, 1);
-  setlocale(LC_ALL, "");
+  const int END = 4;
+  
+  int       iA = 1, iB = 2, iC = 4;
+  char      cA = 1, cB = 2, cC = 4;
+  short int sA = 1, sB = 2, sC = 4;
+  long int  lA = 1, lB = 2, lC = 4;
 
+  for(int i = 0; i < END; i++) printf("Index %d of iA = %d is \'%d\'\n", i, iA, get_bit_state(i, INT, &iA));
+  for(int i = 0; i < END; i++) printf("Index %d of iB = %d is \'%d\'\n", i, iA, get_bit_state(i, INT, &iB));
+  for(int i = 0; i < END; i++) printf("Index %d of iC = %d is \'%d\'\n", i, iA, get_bit_state(i, INT, &iC));
+
+  /* Icon testing
+  icon *icons;
   int num_icons;
   icons = (icon *)load_table(db_file_name, db_table_name, TYPE_ICON, &num_icons);
-
+  */
+  
+  /* ncurses initialization
+  fwide(stdout, 1);
+  setlocale(LC_ALL, "");
   initscr();
-
   UI *ui = create_UI(stdscr);
-  //for(int i = 0; i < num_icons; i++)
-  //{
-  //  mvprintw(0, i*10, "%d", icons[i].id);
-  //  mvprintw(1, i*10, "%lc", icons[i].icon);
-  //  mvprintw(2, i*10, "%s", icons[i].name);
-  //}
-  // refresh();
   wgetch(ui->cmd_window);
   endwin();
+  */
   return 0;
 }
