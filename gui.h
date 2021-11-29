@@ -1,5 +1,6 @@
 #include <ncursesw/ncurses.h>
 #include <stdarg.h>
+#include <wchar.h>
 
 #define UI_PAD 1
 
@@ -21,7 +22,7 @@ int  get_outer_width  ( WINDOW * win );
 int  get_outer_height ( WINDOW * win );
 int  get_inner_width  ( WINDOW * win );
 int  get_inner_height ( WINDOW * win );
-void view_window_fill ( UI * ui, char ch );
+void view_window_fill ( UI * ui, wchar_t wchar );
 
 
 

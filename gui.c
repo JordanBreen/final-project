@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ncursesw/ncurses.h>
 #include "gui.h"
 
 UI *create_UI() { 
@@ -48,14 +49,7 @@ UI *create_UI() {
   box(ui->view_window, 0, 0);
   box(ui->log_window,  0, 0);
 
-  view_window_fill (ui, '.');
-
-  
-  /*
-  head_print_str (ui, "Header Window\n");
-  log_print_str  (ui, "Log Window: \n");
-  cmd_print_str  (ui, ": ");
-  */
+  view_window_fill (ui, (wchar_t)(14844830));
   
   ui_refresh(ui);
   
@@ -66,16 +60,16 @@ int  get_outer_width  ( WINDOW * win )     { return getmaxx(win) - getcurx(win);
 int  get_outer_height ( WINDOW * win )     { return getmaxy(win) - getcury(win); }
 int  get_inner_width  ( WINDOW * win )     { return get_outer_width  (win) - 2;  }
 int  get_inner_height ( WINDOW * win )     { return get_outer_height (win) - 2;  }
-void view_window_fill ( UI * ui, char ch ) {
+void view_window_fill ( UI * ui, wchar_t wchar ) {
   int
     x = getbegx (ui->view_window),
     y = getbegy (ui->view_window),
     w  = get_inner_width (ui->view_window),
     h = get_inner_height (ui->view_window);
-  mvwaddch (ui->view_window, --y, x, ch);
+  mvwaddch (ui->view_window, --y, x, wchar);
   for (int i=y; i<=h; i++)
     for (int j=x; j<=w; j++)
-      mvwaddch(ui->view_window, i, j, ch);
+      mvwaddch (ui->view_window, i, j, wchar);
 }
  
 void ui_refresh (UI *ui) {
