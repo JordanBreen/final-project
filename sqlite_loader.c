@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sqlite_loader.h"
-#include "icon.h"
+#include "spell.h"
 
 void *load_table (const char *db_file_name,
 	          const char *db_table_name,
-	          datatype    storage_datatype,
+	          enum object object_type,
 		  int        *out_size) {
   void         *storage;
   sqlite3      *db         = NULL;
@@ -30,7 +30,7 @@ void *load_table (const char *db_file_name,
     close_loader(err_msg, db);
     exit(1);
   }
-  alloc_storage(&storage, storage_datatype, *out_size, &callback);
+  alloc_storage(&storage, object_type, *out_size, &callback);
   ///////////////////////////////////////////////////////////////////////////
   rc = sqlite3_exec(db, sql_query, callback, storage, &err_msg);
   if (rc != SQLITE_OK ) {      
@@ -45,18 +45,18 @@ void *load_table (const char *db_file_name,
   return storage;
 }
 
-void alloc_storage (void   **storage,
-                    datatype storage_datatype,
-                    int      size,
-                    int   (**callback)(void *, int, char **, char **)) {
-  switch(storage_datatype) {
-    case(TYPE_ICON):
-      size *= sizeof(icon);
-      *storage = (icon*)malloc(size);
-      *callback = &init_icon;
+void alloc_storage (void **storage,
+                    object object_type,
+                    int    size,
+                    int (**callback)(void *, int, char **, char **)) {
+  switch(object_type) {
+    case(SPELL):
+      size     *= sizeof(spell);
+      *storage  = (spell*)malloc(size);
+      *callback = &parse_spell;
       break;
     default:
-      fprintf(stderr, "Fatal: unknown datatype, passed datatype ordinal = %d\n", storage_datatype);
+      fprintf(stderr, "Fatal: unknown object type, passed object of ordinal %02d\n", object_type);
       exit(1);
   }
   if (*storage == NULL) {
