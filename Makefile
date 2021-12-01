@@ -1,5 +1,5 @@
 PROGRAM=final-project.exe
-CFILES=main.c gui.c icon.c sqlite_loader.c utility.c
+CFILES=main.c gui.c spell.c sqlite_loader.c
 OFILES=$(CFILES:.c=.o)
 CC=gcc
 CFLAGS=-g -Wall
