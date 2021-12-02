@@ -1,6 +1,6 @@
 #ifndef  TIME_UNIT_H
 #define  TIME_UNIT_H
-
+#include "str_def.h"
 typedef unsigned int sec;
 
 typedef enum time_unit {
