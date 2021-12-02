@@ -2,27 +2,43 @@
 #define  SPELL_H
 #define  NUM_SPELL_LEVELS 10 // range 0-9
 #include <math.h>
+#include "time_unit.h"
+
+typedef unsigned short spell_id;
 
 typedef struct spell_component_flags {
-  unsigned char       // v/8
-    verbal       : 1, // 1
-    somatic      : 1, // 2
-    material     : 1, // 3
-    focus        : 1, // 4
-    divine_focus : 1; // 5
+  unsigned char // 5/8
+    verbal       : 1,
+    somatic      : 1,
+    material     : 1,
+    focus        : 1,
+    divine_focus : 1;
 } spell_component_flags;
 
 typedef struct spell_attribute_flags {
-  unsigned char           // v/8
-    spell_resistance : 2, // 2
-    shapeable        : 1, // 3
-    dismissable      : 1, // 4
-    mythic           : 1; // 5
+  unsigned char // 5/8
+    spell_resistance : 2,
+    shapeable        : 1,
+    dismissable      : 1,
+    mythic           : 1;
 } spell_attribute_flags;
 
+typedef enum class_type {
+  CORE_CLASS      = 0, 
+  BASE_CLASS      = 1,
+  HYBRID_CLASS    = 2,
+  UNCHAINED_CLASS = 3,
+  OCCULT_CLASS    = 4,
+  ALTERNATE_CLASS = 5,
+  NPC_CLASS       = 6,
+  NUM_CLASS_TYPES = 7
+} class_type;
+
 typedef struct spell_level_by_class {
-  unsigned char
-  level : (int)ceil(log(NUM_SPELL_LEVELS)/log(2));
+  unsigned short // 11/16
+    _level      : (int)ceil(log(NUM_SPELL_LEVELS)/log(2)), // 4 bits [0 - 15] for spell level [0 - 9]
+    _class_type : (int)ceil(log(NUM_CLASS_TYPES)/log(2)),  // 3 bits [0 -  8] for class type  [0 - 6] 
+    _class_id   : 4;
 } spell_level_by_class;
 
 typedef enum answer {
@@ -31,46 +47,79 @@ typedef enum answer {
   SEE_TEXT = 2
 } answer;
 
-typedef enum save {
-  FORT,
-  REF,
-  WILL
-} save;
+typedef enum saving_throw_type {
+  FORT = 0,
+  REF  = 1,
+  WILL = 2,
+  ALL  = 3,
+  NUM_SAVING_THROW_TYPES
+} saving_throw_type;
+
+typedef enum range_type {
+  STATIC_RANGE    = 0,
+  PERSONAL_RANGE  = 1,
+  TOUCH_RANGE     = 2,
+  CLOSE_RANGE     = 3,
+  MEDIUM_RANGE    = 4,
+  LONG_RANGE      = 5,
+  UNLIMITED_RANGE = 6,
+  NUM_RANGE_TYPES
+};
+
+static const int range_type_bases[] = {
+  0,   // STATIC
+  0,   // PERSONAL 
+  0,   // TOUCH
+  25,  // CLOSE
+  100, // MEDIUM
+  400  // LONG
+}
+
+typedef enum growth_type {
+  STATIC = 0,
+  SCALES = 1
+} growth_type;
+
+}
+typedef struct duration {
+  unsigned char _growth_type : 1; // +1 bit
+  time_block    _time_block;      // +8 bits
+}
 
 typedef struct spell {
 //type - identifier ------------- storage
-  unsigned short  id;           // max 65,535 spells, expecting ~2,900 spells
-  char * name;                 // string
-  char * school;               // enum
-  char * subschool;            // enum
-  char * descriptor;           // enum
-  char * spell_level_text;     // ptr array to 'classes'
-  char * casting_time;         // struct
-  char * components_text;      // text
+  spell_id _id;           // max 65,535 spells, expecting ~2,900 spells
+  char * _name;                 // string
+  char * _school;               // enum
+  char * _subschool;            // enum
+  char * _descriptor;           // enum
+  char * _spell_level_text;     // ptr array to 'classes'
+  char * _casting_time;         // struct
+  char * _components_text;      // text
   //char costly_component;     // will be determined elsewhere, skip
-  char * range;                // struct, enclosing enum CLOSE, MEDIUM, LONG
-  char * area;                 // struct
-  char * effect;               // struct
-  char * targets;              // struct
-  char * duration;             // struct
-  char * saving_throw;         // struct
-  char * description_full;     // string
-  char * description_short;    // string
-  char * description_formatted;// string
-  char * source;               // enum
-  char * full_text;            // string
+  char * _range;                // struct, enclosing enum CLOSE, MEDIUM, LONG
+  char * _area;                 // struct
+  char * _effect;               // struct
+  char * _targets;              // struct
+  char * _duration;             // struct
+  char * _saving_throw;         // struct
+  char * _description_full;     // string
+  char * _description_short;    // string
+  char * _description_formatted;// string
+  char * _source;               // enum
+  char * _full_text;            // string
   // Components
-  spell_component_flags components;
-  spell_attribute_flags attributes;
-  unsigned char * spell_level_by_class;
-  char * SLA_level;            // possible part of another flag structure
-  char * domain_text;          // string
-  unsigned char * bloodline_text;       // string
-  unsigned char * patron_text;          // string
-  unsigned char * mythic_text;          // string
-  unsigned char  * mythic_augment_text;  // string
-  unsigned int   * descriptors;          // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
-  unsigned short * material_cost; // possible NULL value;
+  spell_component_flags _components;
+  spell_attribute_flags _attributes;
+  unsigned char * _spell_level_by_class;
+  char * _SLA_level;            // possible part of another flag structure
+  char * _domain_text;          // string
+  unsigned char * _bloodline_text;       // string
+  unsigned char * _patron_text;          // string
+  unsigned char * _mythic_text;          // string
+  unsigned char  * _mythic_augment_text;  // string
+  unsigned int   * _descriptors;          // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
+  unsigned short * _material_cost; // possible NULL value;
 
   // SKIPPED COLUMNS: //
   // costly_component
