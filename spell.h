@@ -1,9 +1,9 @@
 #ifndef  SPELL_H
 #define  SPELL_H
 #define  NUM_SPELL_LEVELS 10 // range 0-9
-#include <math.h>
+//#include <math.h>
 #include "time_unit.h"
-#include "log2.h"
+#include "logx.h"
 #include "bit_def.h"
 #include "str_def.h"
 
@@ -28,8 +28,8 @@ typedef struct spell_attribute_flags {
 
 typedef struct spell_descriptor_flags {
   bit32
-    
-}
+  placeholder : 1;
+} spell_descriptor_flags;
 
 typedef enum class_type {
   CORE_CLASS      = 0, 
@@ -52,7 +52,8 @@ typedef struct spell_level_by_class {
 typedef enum answer {
   NO       = 0,
   YES      = 1,
-  SEE_TEXT = 2
+  SEE_TEXT = 2,
+  NUM_ANSWERS
 } answer;
 
 typedef enum saving_throw_type {
@@ -88,7 +89,6 @@ typedef enum growth_type {
   SCALES = 1
 } growth_type;
 
-}
 typedef struct duration {
   bit08
     _growth_type : 1,                          // +1 bit
@@ -128,7 +128,7 @@ typedef struct spell {
   str _mythic_text;           // string
   str _mythic_augment_text;   // string
   spell_descriptor_flags _descriptors;       // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
-  bit16 * _material_cost;     // possible NULL value;
+  unsigned short _material_cost;     // possible NULL value;
 } spell;
 
 extern int  parse_spell (void*, int, char**, char**);
