@@ -25,24 +25,20 @@ typedef struct spell_attribute_flags {
     dismissable      : 1,
     mythic           : 1;
 } spell_attribute_flags;
+
 /*
-typedef enum class_type {
-  CORE_CLASS      = 0, 
-  BASE_CLASS      = 1,
-  HYBRID_CLASS    = 2,
-  UNCHAINED_CLASS = 3,
-  OCCULT_CLASS    = 4,
-  ALTERNATE_CLASS = 5,
-  NPC_CLASS       = 6,
-  NUM_CLASS_TYPES = 7
-} class_type;
-*/
-typedef struct spell_level_by_class {
+typedef struct spell_level_by_class spell_level_by_class;
+#ifdef CLASS_H
+const int NUM_CLASS_TYPES = get_num_class_types();
+#endif
+struct spell_level_by_class {
   bit_16
     _level      : log2_ceil(NUM_SPELL_LEVELS), // 4 bits [0 - 15] for spell level [0 - 9]
     _class_type : log2_ceil(NUM_CLASS_TYPES),  // 3 bits [0 -  8] for class type  [0 - 6] 
     _class_id   : 4;
-} spell_level_by_class;
+};
+//#endif
+*/
 
 typedef enum answer {
   NO       = 0,
@@ -90,43 +86,9 @@ typedef struct duration //{
   //  _time_unit   : log2_ceil(NUM_TIME_UNITS);  // 3 bits [0 -  8] for time_units [0 - 7]
 /*}*/ duration;
 
-typedef struct spell {
-//type - identifier ------------ storage
-  spell_id _id;               // max 65,535 spells, expecting ~2,900 spells
-  str _name;                  // string
-  str _school;                // enum
-  str _subschool;             // enum
-  str _descriptor;            // enum
-  str _spell_level_text;      // ptr array to 'classes'
-  str _casting_time;          // struct
-  str _components_text;       // text
-  str _range;                 // struct, enclosing enum CLOSE, MEDIUM, LONG
-  str _area;                  // struct
-  str _effect;                // struct
-  str _targets;               // struct
-  str _duration;              // struct
-  str _saving_throw;          // struct
-  str _description_full;      // string
-  str _description_short;     // string
-  str _description_formatted; // string
-  str _source;                // enum
-  str _full_text;             // string
+typedef struct spell spell;
 
-  spell_component_flags _components;
-  spell_attribute_flags _attributes;
-  spell_level_by_class  _level_by_class;
-  
-  str _SLA_level;             // possible part of another flag structure
-  str _domain_text;           // string
-  str _bloodline_text;        // string
-  str _patron_text;           // string
-  str _mythic_text;           // string
-  str _mythic_augment_text;   // string
-  //spell_descriptor_flags _descriptors;       // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
-  unsigned short _material_cost;     // possible NULL value;
-} spell;
-
-extern int  parse_spell (void*, int, char**, char**);
+//extern int  parse_spell (void*, int, char**, char**);
 extern void print_spell (spell*);
 
 #endif

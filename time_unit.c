@@ -37,7 +37,7 @@ int parse_time_unit (void  *NA, int argc, str *argv, str *col) {
 }
 
 void init_time_units() {
-  num_time_units = peek_table_size("Pathfinder.db", "Time_Unit");
+  num_time_units = peek_table_size("Pathfinder.db", "time_unit");
   time_units = (time_unit*) malloc(sizeof(time_unit) * num_time_units);
   load_table ("Pathfinder.db", "Time_Unit", parse_time_unit);
   //print_time_units();

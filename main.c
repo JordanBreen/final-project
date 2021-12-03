@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include "class.h"
 #include "spell.h"
 #include "time_unit.h"
 int main()
 {
   init_time_units();
+  init_class_types();
   /* time_unit testing
   time_block *tb = NULL;
   time_unit   tu = ROUND;

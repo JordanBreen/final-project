@@ -38,6 +38,7 @@ void *load_table (const str db_file_name, const str db_table_name, int(*callback
 }
 
 void alloc_storage (void **storage, object object_type, int size, int(**callback)(void*, int, str*, str*)) {
+  /*
   switch(object_type) {
     case(SPELL):
       size     *= sizeof(spell);
@@ -52,6 +53,7 @@ void alloc_storage (void **storage, object object_type, int size, int(**callback
     fprintf(stderr, "Fatal: failed to allocate %u bytes.\n", size);
     exit(1);
   }
+  */
 }
 
 int count_rows (void *ext, int argc, str *argv, str *col) {
