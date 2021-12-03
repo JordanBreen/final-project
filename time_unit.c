@@ -5,6 +5,7 @@
 #include "sqlite_loader.h"
 #include "time_unit.h"
 
+static const str table_name  = "time_unit"; 
 static byte_1 num_time_units = 0;
 static time_unit *time_units = NULL;
 
@@ -37,10 +38,9 @@ int parse_time_unit (void  *NA, int argc, str *argv, str *col) {
 }
 
 void init_time_units() {
-  num_time_units = peek_table_size("Pathfinder.db", "time_unit");
+  num_time_units = peek_table_size("Pathfinder.db", table_name);
   time_units = (time_unit*) malloc(sizeof(time_unit) * num_time_units);
-  load_table ("Pathfinder.db", "Time_Unit", parse_time_unit);
-  //print_time_units();
+  load_table ("Pathfinder.db", table_name, parse_time_unit);
 }
 
 void print_time_units() {
@@ -56,8 +56,8 @@ void print_time_units() {
 void free_time_units() {
   free(time_units);
 }
-/*
-time_block *new_time_block (int coef, time_unit arg_tu) {
+
+time_block *new_time_block (int coef, time_unit *arg_tu_ref) {
   if(!in_bit_range(coef, TB_COEF_BIT))
      return NULL;
   time_block *ret_tb = (time_block *) malloc(sizeof(time_block));
@@ -65,4 +65,4 @@ time_block *new_time_block (int coef, time_unit arg_tu) {
   ret_tb -> _time_unit   = arg_tu;
   return ret_tb;
 }
-*/
+
