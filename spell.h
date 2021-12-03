@@ -1,7 +1,6 @@
 #ifndef  SPELL_H
 #define  SPELL_H
 #define  NUM_SPELL_LEVELS 10 // range 0-9
-//#include <math.h>
 #include "time_unit.h"
 #include "logx.h"
 #include "bit_def.h"
@@ -10,7 +9,7 @@
 typedef unsigned short spell_id;
 
 typedef struct spell_component_flags {
-  bit08
+  bit_8
     verbal       : 1,
     somatic      : 1,
     material     : 1,
@@ -19,17 +18,12 @@ typedef struct spell_component_flags {
 } spell_component_flags;
 
 typedef struct spell_attribute_flags {
-  bit08
+  bit_8
     spell_resistance : 2,
     shapeable        : 1,
     dismissable      : 1,
     mythic           : 1;
 } spell_attribute_flags;
-
-typedef struct spell_descriptor_flags {
-  bit32
-  placeholder : 1;
-} spell_descriptor_flags;
 
 typedef enum class_type {
   CORE_CLASS      = 0, 
@@ -43,7 +37,7 @@ typedef enum class_type {
 } class_type;
 
 typedef struct spell_level_by_class {
-  bit16
+  bit_16
     _level      : log2_ceil(NUM_SPELL_LEVELS), // 4 bits [0 - 15] for spell level [0 - 9]
     _class_type : log2_ceil(NUM_CLASS_TYPES),  // 3 bits [0 -  8] for class type  [0 - 6] 
     _class_id   : 4;
@@ -89,11 +83,11 @@ typedef enum growth_type {
   SCALES = 1
 } growth_type;
 
-typedef struct duration {
-  bit08
-    _growth_type : 1,                          // +1 bit
-    _time_unit   : log2_ceil(NUM_TIME_UNITS);  // 3 bits [0 -  8] for time_units [0 - 7]
-} duration;
+typedef struct duration //{
+  //bit_8
+  //  _growth_type : 1,                          // +1 bit
+  //  _time_unit   : log2_ceil(NUM_TIME_UNITS);  // 3 bits [0 -  8] for time_units [0 - 7]
+/*}*/ duration;
 
 typedef struct spell {
 //type - identifier ------------ storage
@@ -127,7 +121,7 @@ typedef struct spell {
   str _patron_text;           // string
   str _mythic_text;           // string
   str _mythic_augment_text;   // string
-  spell_descriptor_flags _descriptors;       // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
+  //spell_descriptor_flags _descriptors;       // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
   unsigned short _material_cost;     // possible NULL value;
 } spell;
 

@@ -6,6 +6,8 @@
 
 int main()
 {
+  
+  /* time_unit testing
   time_block *tb = NULL;
   time_unit   tu = ROUND;
   str tu_str = tu_to_str(tu);
@@ -19,7 +21,8 @@ int main()
   tb = new_tb(5, tu);
   str tb_str = tb_to_str(*tb);
   printf("tb_str = %s\n", tb_str);
-
+  */
+  
   //str
   //  db_file_name[]  = "Pathfinder.db",
   //  db_table_name[] = "icon";

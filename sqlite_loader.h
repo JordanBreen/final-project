@@ -1,16 +1,16 @@
 #ifndef SQL_LOADER_H
 #define SQL_LOADER_H
-
 #include <sqlite3.h>
+#include "str_def.h"
 
-typedef enum object {
-  SPELL
-} object;
+typedef enum object object, obj;
 
-void  db_init        (sqlite3 **, const char *, sqlite3_stmt *, char *); 
-void  alloc_storage  (void **, object, int, int(**)(void *, int, char **, char **));
-int   get_table_size (void *,  int, char **, char **);
-void *load_table     (const char *, const char *, object, int *);
-void  close_loader   (char *,  sqlite3 *);
+void  db_init         (sqlite3**, const str, sqlite3_stmt*); 
+void  alloc_storage   (void**, object, int, int(**)(void*, int, str*, str*));
+int   count_rows      (void*, int, str*, str*);
+void* load_table      (const str, const str, object, int*);
+int   peek_table_size (const str, const str);
+int   get_table_size  (sqlite3*, const str);
+void  close_loader    (str,  sqlite3*);
 
 #endif

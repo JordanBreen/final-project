@@ -3,33 +3,38 @@
 #include <string.h>
 #include <math.h>
 #include "time_unit.h"
+/*
+enum time_unit {
+  SECOND = 0,
+  ROUND  = 1,
+  MIN_01 = 2,
+  MIN_10 = 3,
+  HOUR   = 4,
+  DAY    = 5,
+  WEEK   = 6,
+  YEAR   = 7,
+  NUM_TIME_UNITS
+};
+*/
+static time_unit *time_units;
 
-static const sec time_unit_seconds[] = {
-  1,       // SECOND (1:1)
-  6,       // ROUND
-  60,      // MIN_01
-  600,     // MIN_10
-  3600,    // HOUR
-  86400,   // DAY
-  604800,  // WEEK
-  31536000 // YEAR (365 days)
+struct time_unit {
+  bit_8 _id;
+  str   _name;
+  str   _abrv;
+  sec   _sec;
 };
 
-static const str time_unit_strings[] = {
-  "second",
-  "round",
-  "minute",
-  "minutes",
-  "hour",
-  "day",
-  "week",
-  "year"
+struct time_block {
+  bit_8 _coefficient; //: TB_COEF_BIT;               // +4 [0-15]
+  bit_8 _time_unit;   //: log2_ceil(NUM_TIME_UNITS); // +4
 };
 
-sec tu_to_sec (time_unit arg_tu) { return time_unit_seconds[arg_tu]; } 
-str tu_to_str (time_unit arg_tu) { return time_unit_strings[arg_tu]; }
-
-str tb_to_str (time_block arg_tb) {
+//str tu_get_name ( time_unit *arg_tu ) { return arg_tu }
+/*
+sec tu_to_sec ( time_unit  arg_tu ) { return time_unit_seconds[arg_tu]; } 
+str tu_to_str ( time_unit  arg_tu ) { return time_unit_strings[arg_tu]; }
+str tb_to_str ( time_block arg_tb ) {
   time_unit
     cur_tu   = arg_tb._time_unit;
   str
@@ -69,3 +74,5 @@ time_block *new_tb (int coef, time_unit arg_tu) {
   ret_tb -> _time_unit   = arg_tu;
   return ret_tb;
 }
+*/
+#endif
