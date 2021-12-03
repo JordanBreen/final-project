@@ -5,19 +5,12 @@
 #include "sqlite_loader.h"
 #include "time_unit.h"
 
-static byte_1 num_time_units = 0;
-static time_unit *time_units = NULL;
+static byte_1 num_class_types = 0;
+static time_unit *class_types = NULL;
 
-struct time_unit {
+struct class_type {
   bit_8 id;
   str   name;
-  str   abrv;
-  sec   secs;
-};
-
-struct time_block {
-  bit_8      coefficient;
-  time_unit *time_unit_ref;
 };
 
 int parse_time_unit (void  *NA, int argc, str *argv, str *col) {

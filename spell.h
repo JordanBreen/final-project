@@ -1,6 +1,7 @@
 #ifndef  SPELL_H
 #define  SPELL_H
 #define  NUM_SPELL_LEVELS 10 // range 0-9
+#include "class.h"
 #include "time_unit.h"
 #include "logx.h"
 #include "bit_def.h"
@@ -24,7 +25,7 @@ typedef struct spell_attribute_flags {
     dismissable      : 1,
     mythic           : 1;
 } spell_attribute_flags;
-
+/*
 typedef enum class_type {
   CORE_CLASS      = 0, 
   BASE_CLASS      = 1,
@@ -35,7 +36,7 @@ typedef enum class_type {
   NPC_CLASS       = 6,
   NUM_CLASS_TYPES = 7
 } class_type;
-
+*/
 typedef struct spell_level_by_class {
   bit_16
     _level      : log2_ceil(NUM_SPELL_LEVELS), // 4 bits [0 - 15] for spell level [0 - 9]

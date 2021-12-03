@@ -3,10 +3,10 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include "spell.h"
-
+#include "time_unit.h"
 int main()
 {
-  
+  init_time_units();
   /* time_unit testing
   time_block *tb = NULL;
   time_unit   tu = ROUND;
