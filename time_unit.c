@@ -5,11 +5,14 @@
 #include "sqlite_loader.h"
 #include "time_unit.h"
 
+// Globals within the scope of this file : /////////////////////
+
 static const str table_name  = "time_unit"; 
 static byte_1 num_time_units = 0;
 static time_unit *time_units = NULL;
 
-// Struct Definitions: ////////////////////////////////////////////////
+// Struct Definitions: /////////////////////////////////////////
+
 struct time_unit {
   bit_8 id;
   str   name;
@@ -22,11 +25,36 @@ struct time_block {
   bit_8 time_unit_id;
 };
 
-// Constructors and Parsers : //////////////////////////////////////////
+// Sqlite data parser: /////////////////////////////////////////
+
+int parse_time_unit (void *ext, int argc, str *argv, str *col) {
+  const int
+    arg_id   = 0,
+    arg_name = 1,
+    arg_abrv = 2,
+    arg_secs = 3;
+  // setup:
+  int index = atoi(argv[arg_id]) - 1;
+  time_unit *ptr = (time_unit*)ext;
+  ptr += index;
+  // id:
+  ptr->id = index + 1;
+  // name:
+  ptr->name = malloc(strlen(argv[arg_name]) + 1);
+  strcpy(ptr->name, argv[arg_name]);
+  // abrv:
+  ptr->abrv = malloc(strlen(argv[arg_abrv]) + 1);
+  strcpy(ptr->abrv, argv[arg_abrv]);
+  // secs:
+  ptr->secs = atoi(argv[arg_secs]);
+  // done:
+  return 0;
+}
+
+// Constructors: ////////////////////////////////////////////////////////
+
 void init_time_units() {
-  num_time_units = peek_table_size("Pathfinder.db", table_name);
-  time_units = (time_unit*) malloc(sizeof(time_unit) * num_time_units);
-  load_table ("Pathfinder.db", table_name, parse_time_unit);
+  time_units = (time_unit*) load_table ("Pathfinder.db", table_name, parse_time_unit, sizeof(time_unit), (int*) &num_time_units);
 }
 
 time_block *new_time_block (int arg_factor, int arg_time_unit_id) {
@@ -36,36 +64,23 @@ time_block *new_time_block (int arg_factor, int arg_time_unit_id) {
   return ret_time_block;
 }
 
-int parse_time_unit (void  *NA, int argc, str *argv, str *col) {
-  const int
-    arg_id   = 0,
-    arg_name = 1,
-    arg_abrv = 2,
-    arg_secs = 3;
-  int index = atoi(argv[arg_id]) - 1;
-  time_units[index].id = index + 1;
-  time_units[index].name = malloc(strlen(argv[arg_name]) + 1);
-  strcpy(time_units[index].name, argv[arg_name]);
-  time_units[index].abrv = malloc(strlen(argv[arg_abrv]) + 1);
-  strcpy(time_units[index].abrv, argv[arg_abrv]);
-  time_units[index].secs = atoi(argv[arg_secs]);
-  return 0;
-}
 // Destructors: ////////////////////////////////////////////////////////
+
 void free_time_units() {
   free(time_units);
 }
 
-void free_time_block (time_block *arg_time_block_ref) {
-  free(arg_time_block_ref);
+void free_time_block (time_block *time_block_ref) {
+  free(time_block_ref);
 }
 
 // Prints: /////////////////////////////////////////////////////////////
-void print_time_block (time_block *arg_time_block_ref) {
+
+void print_time_block (time_block *time_block_ref) {  
   printf ("- time_block -\n");
-  printf ("  factor        = %d\n", arg_time_block_ref -> factor);
-  printf ("  time_unit_id  = %s\n", arg_time_block_ref -> time_unit_id);
-  print_time_unit(time_unit_id));
+  printf ("  factor        = %d\n", time_block_ref->factor);
+  printf ("  time_unit_id  = %d\n", time_block_ref->time_unit_id);
+  print_time_unit(time_block_ref->time_unit_id);
 }
 
 void print_time_unit(int id) {
