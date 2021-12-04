@@ -3,12 +3,15 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include "class.h"
+#include "descriptor.h"
 #include "spell.h"
 #include "time_unit.h"
+void init_resources();
+void free_resources();
 int main()
 {
-  init_time_units();
-  init_class_types();
+  init_resources();
+
   /* time_unit testing
   time_block *tb = NULL;
   time_unit   tu = ROUND;
@@ -43,5 +46,18 @@ int main()
   wgetch(ui->cmd_window);
   endwin();
   */
+  free_resources();
   return 0;
+}
+void init_resources() {
+  init_time_units();
+  init_class_types();
+  init_classes();
+  init_descriptors();
+}
+void free_resources() {
+  free_time_units();
+  free_class_types();
+  free_classes();
+  free_descriptors();
 }

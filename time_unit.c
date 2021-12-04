@@ -5,9 +5,6 @@
 #include "sqlite_loader.h"
 #include "time_unit.h"
 
-// Globals within the scope of this file : /////////////////////
-
-static const str table_name  = "time_unit"; 
 static byte_1 num_time_units = 0;
 static time_unit *time_units = NULL;
 
@@ -54,7 +51,7 @@ int parse_time_unit (void *ext, int argc, str *argv, str *col) {
 // Constructors: ////////////////////////////////////////////////////////
 
 void init_time_units() {
-  time_units = (time_unit*) load_table ("Pathfinder.db", table_name, parse_time_unit, sizeof(time_unit), (int*) &num_time_units);
+  time_units = (time_unit*) load_table ("Pathfinder.db", "time_unit", parse_time_unit, sizeof(time_unit), (int*) &num_time_units);
 }
 
 time_block *new_time_block (int arg_factor, int arg_time_unit_id) {

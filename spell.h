@@ -55,40 +55,10 @@ typedef enum saving_throw_type {
   NUM_SAVING_THROW_TYPES
 } saving_throw_type;
 
-typedef enum range_type {
-  STATIC_RANGE    = 0,
-  PERSONAL_RANGE  = 1,
-  TOUCH_RANGE     = 2,
-  CLOSE_RANGE     = 3,
-  MEDIUM_RANGE    = 4,
-  LONG_RANGE      = 5,
-  UNLIMITED_RANGE = 6,
-  NUM_RANGE_TYPES
-} range_type;
-
-static const short range_type_bases[] = {
-  0,   // STATIC
-  0,   // PERSONAL 
-  0,   // TOUCH
-  25,  // CLOSE
-  100, // MEDIUM
-  400  // LONG
-};
-
-typedef enum growth_type {
-  STATIC = 0,
-  SCALES = 1
-} growth_type;
-
-typedef struct duration //{
-  //bit_8
-  //  _growth_type : 1,                          // +1 bit
-  //  _time_unit   : log2_ceil(NUM_TIME_UNITS);  // 3 bits [0 -  8] for time_units [0 - 7]
-/*}*/ duration;
+typedef struct duration duration;
 
 typedef struct spell spell;
 
-//extern int  parse_spell (void*, int, char**, char**);
 extern void print_spell (spell*);
 
 #endif
