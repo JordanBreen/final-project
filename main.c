@@ -2,10 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include "class.h"
-#include "descriptor.h"
 #include "spell.h"
-#include "time_unit.h"
 void init_resources();
 void free_resources();
 int main()
@@ -50,14 +47,20 @@ int main()
   return 0;
 }
 void init_resources() {
-  init_time_units();
   init_class_types();
   init_classes();
   init_descriptors();
+  init_ranges();
+  init_schools();
+  init_subschools();
+  init_time_units();
 }
 void free_resources() {
-  free_time_units();
   free_class_types();
   free_classes();
   free_descriptors();
+  free_ranges();
+  free_schools();
+  free_subschools();
+  free_time_units();
 }

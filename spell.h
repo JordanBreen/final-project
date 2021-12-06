@@ -1,11 +1,19 @@
 #ifndef  SPELL_H
 #define  SPELL_H
 #define  NUM_SPELL_LEVELS 10 // range 0-9
+// structures:
 #include "class.h"
+#include "descriptor.h"
+#include "range.h"
+#include "school.h"
+#include "spell.h"
+#include "subschool.h"
 #include "time_unit.h"
+// utilities:
 #include "logx.h"
 #include "bit_def.h"
 #include "str_def.h"
+#include "id_group.h"
 
 typedef unsigned short spell_id;
 
@@ -46,14 +54,6 @@ typedef enum answer {
   SEE_TEXT = 2,
   NUM_ANSWERS
 } answer;
-
-typedef enum saving_throw_type {
-  FORT = 0,
-  REF  = 1,
-  WILL = 2,
-  ALL  = 3,
-  NUM_SAVING_THROW_TYPES
-} saving_throw_type;
 
 typedef struct duration duration;
 
