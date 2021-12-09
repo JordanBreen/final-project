@@ -5,9 +5,9 @@
 #include "buf_def.h"
 struct spell {
 //type - identifier ------------ storage
-  bit_16 id;               // max 65,535 spells, expecting ~2,900 spells
-  str    name;
-  id_group *school_id_group;
+  bit_16   id;               // max 65,535 spells, expecting ~2,900 spells
+  str      name;
+  bit_8    *school_id;
   id_group *subschool_id_group;
   id_group *descriptor_id_group;
   str _spell_level_text;      // ptr array to 'classes'
@@ -39,7 +39,7 @@ struct spell {
   unsigned short _material_cost;     // possible NULL value;
 };
 
-id_group* process_school_ids(str arg_str);
+bit_8* process_school_id(str arg_str);
 int parse_spell (void *ext, int argc, str *argv, str *col) {
   const int
     arg_id             = 0,
@@ -58,7 +58,7 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
   ptr->name = malloc(strlen(argv[arg_name]) + 1);
   strcpy(ptr->name, argv[arg_name]);
   // school_ids:
-  strcpy(buffer, argv[arg_school_ids]);
+  strcpy(buffer, argv[arg_school_id]);
   ptr->school_id = atoi(argv[arg_school_id]);
   // subschool_ids:
   ptr->school_id = atoi(argv[arg_school_id]);

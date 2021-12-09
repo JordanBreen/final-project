@@ -12,6 +12,7 @@ static const int MIN_CAP = 1;
 static const int MAX_CAP = 8;
 
 struct id_group {
+  bit_8 id;
   bit_8 *ids;
   bit_8 num_ids  : 3; // max 8 related ids
   bit_8 capacity : 3; // max 8 slots for related ids
