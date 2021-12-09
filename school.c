@@ -3,7 +3,7 @@
 #include <string.h>
 #include "sqlite_loader.h"
 #include "school.h"
-
+#include "index.h"
 static bit_8   num_schools = 0;
 static school *schools     = NULL;
 
@@ -37,7 +37,6 @@ int parse_school (void  *ext, int argc, str *argv, str *col) {
 
 void init_schools () {
   schools = (school*) load_table ("Pathfinder.db", "school", parse_school, sizeof(school), (int*) &num_schools);
-  print_schools();
 }
 
 void free_schools () {
@@ -46,7 +45,11 @@ void free_schools () {
 
 /////////////////////////////////////////////////
 
+void print_school ( bit_8 id ) {
+  printf ("- school [%d] %s\n", schools[id_to_index(id)].id, schools[id_to_index(id)].name);
+}
+
 void print_schools () {
-  for(int i=0; i < num_schools; i++)
-    printf ("- school [%d] %s\n", schools[i].id, schools[i].name);
+  for(int i=1; i <= num_schools; i++)
+    print_school(i);
 }

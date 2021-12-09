@@ -6,8 +6,9 @@
 
 typedef struct school school;
 
-extern void init_schools();
-extern void free_schools();
-extern void print_schools();
+extern void init_schools  ();
+extern void free_schools  ();
+extern void print_school  (bit_8);
+extern void print_schools ();
 
 #endif

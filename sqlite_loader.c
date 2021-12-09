@@ -30,6 +30,7 @@ void* load_table (const str db_file_name, const str db_table_name, int(*callback
   sqlite3_close(db);
   return storage;
 }
+
 int count_rows (void *ext, int argc, str *argv, str *col) {
   int *size = (int*)ext;
   *size = atoi(*argv);
