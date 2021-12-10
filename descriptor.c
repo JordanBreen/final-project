@@ -3,6 +3,7 @@
 #include <string.h>
 #include "sqlite_loader.h"
 #include "descriptor.h"
+#include "index.h"
 
 static bit_8       num_descriptors = 0;
 static descriptor *descriptors     = NULL;
@@ -10,8 +11,8 @@ static descriptor *descriptors     = NULL;
 //////////////////////////////////////////////
 
 struct descriptor {
-  bit_8 id; 
-  str   name;
+  d_id id; 
+  str  name;
 };
 
 ///////////////////////////////////////////////
@@ -44,6 +45,23 @@ void free_descriptors() {
 }
 
 /////////////////////////////////////////////////
+
+d_id get_id_descriptor (str arg_name) {
+  for(int i = 0; i < num_descriptors; i++)
+    if(arg_name[0] == descriptors[i].name[0] && strcmp(arg_name, descriptors[i].name) == 0)
+      return descriptors[i].id;
+  fprintf(stderr, "%s:%s() ERROR, %s not found as a name in descriptors\n", __FILE__, __func__, arg_name);
+  return -1;
+}
+
+str get_name_descriptor (descriptor_id arg_id) {
+  return descriptors[id_to_index(arg_id)].name;
+}
+
+int get_num_descriptors () {
+  return num_descriptors;
+}
+
 
 void print_descriptors() {
   for(int i=0; i < num_descriptors; i++) {

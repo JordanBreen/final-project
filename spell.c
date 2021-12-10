@@ -10,8 +10,8 @@ struct spell {
   str          _name;
   school_id    _school_id    : SCHOOL_ID_BIT;
   subschool_id _subschool_id : SUBSCHOOL_ID_BIT;
-  bit_8        _is_multi_subschool : 1;
-  id_group *_descriptor_id_group;
+  byte         _is_multi_subschool : 1;
+  id_group    *_descriptor_id;
   str _spell_level_text;      // ptr array to 'classes'
   str _casting_time;          // struct
   str _components_text;       // text
@@ -41,7 +41,7 @@ struct spell {
   unsigned short _material_cost;     // possible NULL value;
 };
 
-void process_descriptor_ids (spell *ptr, str arg_str);
+void process_descriptor_ids (spell *ptr, str *argv, str *col, int length);
 void process_subschool_ids  (spell *ptr, str arg_str);
 int parse_spell (void *ext, int argc, str *argv, str *col) {
   const int
@@ -49,8 +49,8 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
     POS_NAME          = 1,
     POS_SCHOOL_ID     = 2,
     POS_SUBSCHOOL_ID  = 3,
-    POS_DESCRIPTOR_START = 44,
-    POS_DESCRIPTOR_END   = 68;
+    POS_DESCRIPTOR_START = 56,
+    POS_DESCRIPTOR_END   = 83;
   
     //POS_DESCRIPTOR_ID = 4;
   // buf buffer;
@@ -67,6 +67,8 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
   ptr->_school_id = (school_id)atoi(argv[POS_SCHOOL_ID]);
   // subschool_ids:
   process_subschool_ids(ptr, argv[POS_SUBSCHOOL_ID]);
+  // descriptor_ids:
+  process_descriptor_ids(ptr, &argv[POS_DESCRIPTOR_START], &col[POS_DESCRIPTOR_START], POS_DESCRIPTOR_END - POS_DESCRIPTOR_START);
   // done:
   return 0;
 }
@@ -79,13 +81,22 @@ spell *load_spell(spell_id id) {
 
 void print_spell (spell *spell_ref) {
   printf("%s\n", spell_ref->_name);
-  printf("School %s(%s)[]\n",
+  printf("School %s(%s)[%s]\n",
 	 get_name_school(spell_ref->_school_id),
-	 get_name_subschool(spell_ref->_subschool_id, spell_ref->_is_multi_subschool));
+	 get_name_subschool(spell_ref->_subschool_id, spell_ref->_is_multi_subschool),
+	 get_name_descriptor(get_ref_id_group(spell_ref->_descriptor_id, 0))); // just grabbing the first, temp solution for testing
 }
 
-void process_subschool_ids(spell *ptr, str *argv, str *col) {
-  
+void process_descriptor_ids(spell *ptr, str *argv, str *col, int length) {
+  descriptor_id
+    ids[get_num_descriptors()],
+    id_count = 0;
+  for(int i = 0; i < length; i++)
+    if(atoi(argv[i]) == 1)
+      ids[id_count++] = get_id_descriptor(col[i]);
+  ptr->_descriptor_id = new_id_group(id_count);
+  for(int i = 0; i < id_count; i++)
+    add_ref_id_group(ptr->_descriptor_id, ids[i]);
 }
 
 void process_subschool_ids(spell *ptr, str arg_str) {
