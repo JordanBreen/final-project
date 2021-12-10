@@ -32,6 +32,7 @@ void* load_table (const str db_file_name, const str db_table_name, int(*callback
 }
 
 void* load_by_id (const str db_file_name, const str db_table_name, int(*callback)(void*, int, str*, str*), size_t obj_size, int id) {
+  printf("%s:%s() ENTRY\n", __FILE__, __func__);
   void *storage;
   sqlite3 *db = NULL;
   sqlite3_stmt *res = NULL;
@@ -61,6 +62,7 @@ void* load_by_id (const str db_file_name, const str db_table_name, int(*callback
   sqlite3_finalize(res);
   sqlite3_close(db);
   return storage;
+  printf("%s:%s() EXIT\n", __FILE__, __func__);
 }
 
 

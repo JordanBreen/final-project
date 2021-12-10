@@ -1,6 +1,6 @@
 #ifndef  CLASS_H
 #define  CLASS_H
-#define  CLASS_ID_BIT 5
+#define  CLASS_ID_BIT 6
 #define  CLASS_TYPE_ID_BIT 3
 #define  SKILL_RANK_BIT 4
 #include "bit_def.h"

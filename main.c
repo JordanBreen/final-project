@@ -1,5 +1,6 @@
 #include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include "spell.h"
@@ -7,12 +8,14 @@ void init_resources();
 void free_resources();
 int main()
 {
+  printf("%s:%s() ENTRY\n", __FILE__, __func__);
   init_resources();
+  printf("%s:%s() RESOURCES INITIALIZED\n", __FILE__, __func__);
 
   spell *test;
-  for(int i = 1; i <= 10 ; i++) {
+  for(int i = 1; i <= 5 ; i++) {
    test = load_spell(i);
-
+   free(test);
   }
   /* time_unit testing
   time_block *tb = NULL;
@@ -53,8 +56,11 @@ int main()
 }
 void init_resources() {
   init_class_types();
+  printf("%s:%s() CLASS TYPES INITIALIZED\n", __FILE__, __func__);
   init_classes();
+  printf("%s:%s() CLASSES INITIALIZED\n", __FILE__, __func__);
   init_descriptors();
+  printf("%s:%s() DESCRIPTORS INITIALIZED\n", __FILE__, __func__);
   init_ranges();
   init_schools();
   init_subschools();
