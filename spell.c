@@ -1,19 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "sqlite_loader.h"
 #include "spell.h"
 #include "buf_def.h"
 struct spell {
 //type - identifier ------------ storage
-  bit_16   id;               // max 65,535 spells, expecting ~2,900 spells
-  str      name;
-  bit_8    school_id;
-  id_group *subschool_id_group;
-  id_group *descriptor_id_group;
+  spell_id     _id           : SPELL_ID_BIT;               // max 65,535 spells, expecting ~2,900 spells
+  str          _name;
+  school_id    _school_id    : SCHOOL_ID_BIT;
+  subschool_id _subschool_id : SUBSCHOOL_ID_BIT;
+  bit_8        _is_multi_subschool : 1;
+  id_group *_descriptor_id_group;
   str _spell_level_text;      // ptr array to 'classes'
   str _casting_time;          // struct
   str _components_text;       // text
-  bit_8  range_id;            // struct, enclosing enum CLOSE, MEDIUM, LONG
+  bit_8  _range_id;            // struct, enclosing enum CLOSE, MEDIUM, LONG
   str _area;                  // struct
   str _effect;                // struct
   str _targets;               // struct
@@ -39,43 +41,63 @@ struct spell {
   unsigned short _material_cost;     // possible NULL value;
 };
 
-bit_8* process_school_id(str arg_str);
+void process_descriptor_ids (spell *ptr, str arg_str);
+void process_subschool_ids  (spell *ptr, str arg_str);
 int parse_spell (void *ext, int argc, str *argv, str *col) {
   const int
     POS_ID            = 0,
     POS_NAME          = 1,
     POS_SCHOOL_ID     = 2,
     POS_SUBSCHOOL_ID  = 3,
-    POS_DESCRIPTOR_ID = 4;
-  buf buffer;
+    POS_DESCRIPTOR_START = 44,
+    POS_DESCRIPTOR_END   = 68;
+  
+    //POS_DESCRIPTOR_ID = 4;
+  // buf buffer;
   // setup:
   int index = atoi(argv[POS_ID]) - 1;
   spell *ptr = (spell*)ext;
   ptr += index;
   // id:
-  ptr->id = index + 1;
+  ptr->_id = index + 1;
   // name:
-  ptr->name = malloc(strlen(argv[POS_NAME]) + 1);
-  strcpy(ptr->name, argv[POS_NAME]);
+  ptr->_name = malloc(strlen(argv[POS_NAME]) + 1);
+  strcpy(ptr->_name, argv[POS_NAME]);
   // school_id:
-  ptr->school_id = (bit_8)atoi(argv[POS_SCHOOL_ID]);
+  ptr->_school_id = (school_id)atoi(argv[POS_SCHOOL_ID]);
   // subschool_ids:
-  int ret_id =  atoi(argv[POS_SUBSCHOOL_ID]);
-  if(ret_id <= get_num_subschools()) { // we have a normal subschool group with a single id
-    ptr->subschool_id_group = new_id_group(1);
-    add_ref_id_group(ptr->subschool_id_group, ret_id);
-  } else { // we have a group with multiple ids
-    ptr->subschool_id_group = get_subschool_id_group(ret_id - get_num_subschools());
-  }
+  process_subschool_ids(ptr, argv[POS_SUBSCHOOL_ID]);
   // done:
   return 0;
 }
 
-void print_spell (spell *spell_ptr) {
-
+spell *load_spell(spell_id id) {
+  spell *out = (spell*) load_by_id ("Pathfinder.db", "spell", parse_spell, sizeof(spell), id);
+  print_spell(out);
+  return out;
 }
 
-id_group* process_subschool_ids(str arg_str) {
-  //const char DELIM[2] = "";
-  return NULL;
+void print_spell (spell *spell_ref) {
+  printf("%s\n", spell_ref->_name);
+  printf("School %s(%s)[]\n",
+	 get_name_school(spell_ref->_school_id),
+	 get_name_subschool(spell_ref->_subschool_id, spell_ref->_is_multi_subschool));
 }
+
+void process_subschool_ids(spell *ptr, str *argv, str *col) {
+  
+}
+
+void process_subschool_ids(spell *ptr, str arg_str) {
+  subschool_id ret_id = (subschool_id) atoi(arg_str);
+  if(ret_id <= get_num_subschools())
+  { // we have a normal subschool group with a single id
+    ptr->_subschool_id = ret_id;
+    ptr->_is_multi_subschool = 0;
+  } else
+  { // we have a group with multiple ids
+    ptr->_subschool_id = ret_id - get_num_subschools();
+    ptr->_is_multi_subschool = 1;
+  }
+}
+

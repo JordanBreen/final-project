@@ -9,6 +9,7 @@ int main()
 {
   init_resources();
 
+  load_spell(1);
   /* time_unit testing
   time_block *tb = NULL;
   time_unit   tu = ROUND;

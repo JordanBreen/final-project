@@ -1,5 +1,6 @@
 #ifndef  SPELL_H
 #define  SPELL_H
+#define  SPELL_ID_BIT 12
 #define  NUM_SPELL_LEVELS 10 // range 0-9
 // structures:
 #include "class.h"
@@ -15,7 +16,7 @@
 #include "str_def.h"
 #include "id_group.h"
 
-typedef unsigned short spell_id;
+typedef bit_16 spell_id;
 
 typedef struct spell_component_flags {
   bit_8
@@ -59,6 +60,7 @@ typedef struct duration duration;
 
 typedef struct spell spell;
 
+extern spell* load_spell(spell_id id);
 extern void print_spell (spell*);
 
 #endif

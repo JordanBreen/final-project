@@ -31,6 +31,32 @@ void* load_table (const str db_file_name, const str db_table_name, int(*callback
   return storage;
 }
 
+void* load_by_id (const str db_file_name, const str db_table_name, int(*callback)(void*, int, str*, str*), size_t obj_size, int id) {
+  void *storage;
+  sqlite3 *db = NULL;
+  sqlite3_stmt *res = NULL;
+  str err_msg = NULL;
+  buf sql_query;
+  int rc;
+
+  db_init(&db, db_file_name, res);
+  sprintf(sql_query, "SELECT * FROM %s WHERE id = %d", db_table_name, id);
+  storage = malloc(obj_size);
+
+  rc = sqlite3_exec(db, sql_query, callback, storage, &err_msg);
+  if (rc != SQLITE_OK ) {
+    fprintf(stderr, "Failed to select data from db_file: %s table: %s\n", db_file_name, db_table_name);
+    fprintf(stderr, "SQL error: %s\n", err_msg);
+    close_loader(err_msg, db);
+    exit(1);
+  }
+
+  sqlite3_finalize(res);
+  sqlite3_close(db);
+  return storage;
+}
+
+
 int count_rows (void *ext, int argc, str *argv, str *col) {
   int *size = (int*)ext;
   *size = atoi(*argv);

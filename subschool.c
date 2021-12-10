@@ -15,9 +15,9 @@ static id_group
 //////////////////////////////////////////////
 
 struct subschool {
-  bit_8     id;            // for possible id(s) 
-  str       name;          // varied
-  bit_8     school_id : 4; // exp: 16
+  subschool_id id : SUBSCHOOL_ID_BIT;        // for personal id 
+  str          name;          // varied
+  school_id    school_id : SCHOOL_ID_BIT; // exp: 16
 };
 
 ///////////////////////////////////////////////
@@ -93,7 +93,13 @@ void free_subschool_groups () {
 }
 
 /////////////////////////////////////////////////
- 
+str get_name_subschool (subschool_id id, bit_8 multi_subschool) {
+  if(!multi_subschool)
+    return subschools[id_to_index(id)].name;
+  else
+    return subschools[get_ref_id_group(get_index_ptr_id_group(subschool_id_groups, id_to_index(id)), 0)].name;
+}
+
 void print_subschool (bit_8 id) {
   printf("[%d]%s\n",
 	 subschools[id_to_index(id)].id,
@@ -119,6 +125,6 @@ bit_8 get_num_subschools() {
   return num_subschools;
 }
 
-id_group *get_subschool_id_group(bit_8 id) {
+id_group *get_subschool_id_group(subschool_id id) {
   return get_index_ptr_id_group(subschool_id_groups, id_to_index(id));
 }
