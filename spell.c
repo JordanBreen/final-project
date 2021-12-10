@@ -9,8 +9,7 @@ struct spell {
   spell_id     _id           : SPELL_ID_BIT;               // max 65,535 spells, expecting ~2,900 spells
   str          _name;
   school_id    _school_id    : SCHOOL_ID_BIT;
-  subschool_id _subschool_id : SUBSCHOOL_ID_BIT;
-  byte         _is_multi_subschool : 1;
+  id_group    *_subschool_id;
   id_group    *_descriptor_id;
   str _spell_level_text;      // ptr array to 'classes'
   str _casting_time;          // struct
@@ -52,12 +51,9 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
     POS_DESCRIPTOR_START = 56,
     POS_DESCRIPTOR_END   = 83;
   
-    //POS_DESCRIPTOR_ID = 4;
-  // buf buffer;
   // setup:
   int index = atoi(argv[POS_ID]) - 1;
   spell *ptr = (spell*)ext;
-  ptr += index;
   // id:
   ptr->_id = index + 1;
   // name:
@@ -80,11 +76,17 @@ spell *load_spell(spell_id id) {
 }
 
 void print_spell (spell *spell_ref) {
+  str subschool_str  = to_string_id_group(spell_ref->_subschool_id, get_name_subschool);
   printf("%s\n", spell_ref->_name);
-  printf("School %s(%s)[%s]\n",
-	 get_name_school(spell_ref->_school_id),
-	 get_name_subschool(spell_ref->_subschool_id, spell_ref->_is_multi_subschool),
-	 get_name_descriptor(get_ref_id_group(spell_ref->_descriptor_id, 0))); // just grabbing the first, temp solution for testing
+  printf("School %s(%s)", get_name_school(spell_ref->_school_id), subschool_str);
+  free(subschool_str);
+  subschool_str = NULL;
+  if(spell_ref->_descriptor_id) {
+    str descriptor_str = to_string_id_group(spell_ref->_descriptor_id, get_name_descriptor);
+    printf("[%s]", descriptor_str);
+    free(descriptor_str); descriptor_str = NULL;
+  }
+  printf("\n");
 }
 
 void process_descriptor_ids(spell *ptr, str *argv, str *col, int length) {
@@ -94,21 +96,24 @@ void process_descriptor_ids(spell *ptr, str *argv, str *col, int length) {
   for(int i = 0; i < length; i++)
     if(atoi(argv[i]) == 1)
       ids[id_count++] = get_id_descriptor(col[i]);
-  ptr->_descriptor_id = new_id_group(id_count);
-  for(int i = 0; i < id_count; i++)
-    add_ref_id_group(ptr->_descriptor_id, ids[i]);
+  if(id_count > 0) {
+    ptr->_descriptor_id = new_id_group(id_count);
+    for(int i = 0; i < id_count; i++)
+      add_ref_id_group(ptr->_descriptor_id, ids[i]);
+  }
+  else
+    ptr->_descriptor_id = NULL;
 }
 
 void process_subschool_ids(spell *ptr, str arg_str) {
   subschool_id ret_id = (subschool_id) atoi(arg_str);
   if(ret_id <= get_num_subschools())
   { // we have a normal subschool group with a single id
-    ptr->_subschool_id = ret_id;
-    ptr->_is_multi_subschool = 0;
-  } else
-  { // we have a group with multiple ids
-    ptr->_subschool_id = ret_id - get_num_subschools();
-    ptr->_is_multi_subschool = 1;
-  }
+    //printf("here1\n");
+    ptr->_subschool_id = new_id_group(1);
+    //printf("here2\n");
+    add_ref_id_group(ptr->_subschool_id, ret_id);
+  } else // we have a group with multiple ids
+    ptr->_subschool_id = get_subschool_id_group(ret_id - get_num_subschools());
 }
 

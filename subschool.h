@@ -11,7 +11,7 @@ typedef bit_8 subschool_id;
 
 extern void  init_subschools ();
 extern void  free_subschools ();
-extern str   get_name_subschool (subschool_id, bit_8);
+extern str   get_name_subschool (subschool_id);
 extern bit_8 get_num_subschools ();
 extern id_group* get_subschool_id_group(subschool_id); 
 extern void  print_subschool (subschool_id);

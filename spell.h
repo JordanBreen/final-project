@@ -60,7 +60,7 @@ typedef struct duration duration;
 
 typedef struct spell spell;
 
-extern spell* load_spell(spell_id id);
+extern spell *load_spell(spell_id);
 extern void print_spell (spell*);
 
 #endif

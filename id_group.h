@@ -21,6 +21,7 @@ ref_id    get_num_ref_id_group    (id_group *);
 bit_8     get_capacity_id_group   (id_group *);
 int       index_in_range_id_group (id_group *, bit_8);
 int       is_full_id_group        (id_group *);
-void      print_id_group          (id_group *);
+void      print_id_group          (id_group *, void(*)(ref_id));
+str       to_string_id_group      (id_group *, str (*)(ref_id));
 id_group *get_index_ptr_id_group  (id_group *, bit_8);
 #endif

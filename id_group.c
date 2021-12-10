@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "id_group.h"
-
+#include "buf_def.h"
 enum relation {
   AND = 0,
   OR = 1,
@@ -29,10 +30,10 @@ size_t get_size_of_id_group () {
 // returns a new id_group, capacity set to int arg_capacity
 id_group *new_id_group(int arg_capacity) {
     if (arg_capacity > MAX_CAP) {
-    fprintf(stderr, "%s:%s(int arg_num_ids = %d), Error num_ids greater than MAX_CAP(%d)\n", __FILE__, __func__, arg_capacity, MAX_CAP);
+    fprintf(stderr, "%s:%s(int arg_capacity = %d), Error num_ids greater than MAX_CAP(%d)\n", __FILE__, __func__, arg_capacity, MAX_CAP);
     exit(1);
   } else if (arg_capacity < MIN_CAP) {
-    fprintf(stderr, "%s:%s(int arg_num_ids = %d), Error num_ids less than MIN_CAP(%d)\n", __FILE__, __func__, arg_capacity, MIN_CAP);
+    fprintf(stderr, "%s:%s(int arg_capacity = %d), Error num_ids less than MIN_CAP(%d)\n", __FILE__, __func__, arg_capacity, MIN_CAP);
     exit(1);
   } else {
     id_group *out = (id_group*)malloc(sizeof(id_group));
@@ -117,11 +118,18 @@ int is_full_id_group (id_group *id_group_ref) {
   return id_group_ref->num_refs >= id_group_ref->capacity;
 }
 
-void print_id_group (id_group *id_group_ref) {
-  printf("id group <@:%p> cap:%d; num_ref:%d [", id_group_ref, id_group_ref->capacity, id_group_ref->num_refs);
-  for(int i = 0; i < id_group_ref->num_refs; i++)
-    printf("%d,", id_group_ref->refs[i]);
-  printf("\b]\n");
+void print_id_group (id_group *id_group_ref, void(*print_function)(ref_id)) {
+  for(int i = 0; i < id_group_ref->capacity; i++)
+    print_function(id_group_ref->refs[i]);
+}
+
+str to_string_id_group (id_group *id_group_ref, str(*to_str_function)(ref_id)) {
+  buf buffer = "";
+  for(int i = 0; i < id_group_ref->capacity; i++)
+    sprintf(buffer, (i==id_group_ref->capacity-1)? "%s%s" : "%s%s, ", buffer, to_str_function(id_group_ref->refs[i]));
+  str ret_str = malloc(strlen(buffer)+1);
+  strcpy(ret_str, buffer);
+  return ret_str;
 }
 
 id_group* get_index_ptr_id_group (id_group *array_ref, bit_8 index) {  

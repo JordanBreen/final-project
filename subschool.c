@@ -93,17 +93,12 @@ void free_subschool_groups () {
 }
 
 /////////////////////////////////////////////////
-str get_name_subschool (subschool_id id, bit_8 multi_subschool) {
-  if(!multi_subschool)
-    return subschools[id_to_index(id)].name;
-  else
-    return subschools[get_ref_id_group(get_index_ptr_id_group(subschool_id_groups, id_to_index(id)), 0)].name;
+str get_name_subschool (subschool_id id) {
+  return subschools[id_to_index(id)].name;
 }
 
-void print_subschool (bit_8 id) {
-  printf("[%d]%s\n",
-	 subschools[id_to_index(id)].id,
-	 subschools[id_to_index(id)].name);
+void print_subschool (subschool_id id) {
+  printf("%s", subschools[id_to_index(id)].name);
 }
 
 void print_subschools () {
@@ -111,9 +106,8 @@ void print_subschools () {
     print_subschool(id);
 }
 
-void print_subschool_id_group (bit_8 id) {
-  printf("subschool ");
-  print_id_group(get_subschool_id_group(id));
+void print_subschool_id_group (subschool_id id) {
+  print_id_group(get_subschool_id_group(id), print_subschool);
 }
 
 void print_subschool_id_groups () {
