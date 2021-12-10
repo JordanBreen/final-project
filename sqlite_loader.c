@@ -37,12 +37,19 @@ void* load_by_id (const str db_file_name, const str db_table_name, int(*callback
   sqlite3_stmt *res = NULL;
   str err_msg = NULL;
   buf sql_query;
-  int rc;
-
+  int rc, table_size; 
   db_init(&db, db_file_name, res);
+
+  table_size = get_table_size(db, db_file_name, db_table_name);
+  if (id < 1 || id > table_size) {
+    fprintf(stderr, "%s:%s() ERROR, id %d is outside the range of possible id values [1,%d]\n", __FILE__, __func__, id, table_size);
+    close_loader(err_msg, db);
+    exit(1);
+  }
+  
   sprintf(sql_query, "SELECT * FROM %s WHERE id = %d", db_table_name, id);
   storage = malloc(obj_size);
-
+  
   rc = sqlite3_exec(db, sql_query, callback, storage, &err_msg);
   if (rc != SQLITE_OK ) {
     fprintf(stderr, "Failed to select data from db_file: %s table: %s\n", db_file_name, db_table_name);

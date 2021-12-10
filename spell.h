@@ -8,6 +8,7 @@
 #include "range.h"
 #include "school.h"
 #include "spell.h"
+#include "spell_level.h"
 #include "subschool.h"
 #include "time_unit.h"
 // utilities:

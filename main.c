@@ -8,9 +8,12 @@ void free_resources();
 int main()
 {
   init_resources();
- 
-  spell *test1 = load_spell(1);
-  spell *test2 = load_spell(360);
+
+  spell *test;
+  for(int i = 1; i <= 10 ; i++) {
+   test = load_spell(i);
+
+  }
   /* time_unit testing
   time_block *tb = NULL;
   time_unit   tu = ROUND;

@@ -3,74 +3,71 @@
 #include <string.h>
 #include "sqlite_loader.h"
 #include "class.h"
-
-static bit_8       num_class_types       = 0;
-static bit_8       num_classes           = 0;
-static class_type *class_types           = NULL;
-static class      *classes               = NULL;
+#include "index.h"
+static byte        num_class_types = 0;
+static byte        num_classes     = 0;
+static class_type *class_types     = NULL;
+static class      *classes         = NULL;
 
 //////////////////////////////////////////////
 
 struct class_type {
-  bit_8 id : 3; // exp: 7 class types
-  str   name;   // varies
+  class_type_id _id : CLASS_TYPE_ID_BIT; // exp: 7 class types
+  str           _name;                   // varies
 };
 
 struct class {
-  bit_8 id;
-  str   name;
-  str   abrv;              // exp: 3 characters
-  bit_8 class_type_id : 3; // exp: 7 class types
-  bit_8 skill_ranks   : 4; // exp: max value of 8 (rogue)
-  bit_8 source_id;
+  class_id      _id : CLASS_ID_BIT;
+  str           _name;
+  str           _abrv;                              // exp: 3 characters
+  class_type_id _class_type_id : CLASS_TYPE_ID_BIT; // exp: 7 class types
+  bit_8         _skill_ranks   : SKILL_RANK_BIT;    // exp: max value of 8 (rogue)
+  bit_8         _source_id;
 };
 
 ///////////////////////////////////////////////
 
 int parse_class_type (void  *ext, int argc, str *argv, str *col) {
   const int
-    arg_id   = 0,
-    arg_name = 1;
+    POS_ID   = 0,
+    POS_NAME = 1;
   // setup:
-  int index = atoi(argv[arg_id]) - 1;
+  int index = atoi(argv[POS_ID]) - 1;
   class_type *ptr = (class_type*)ext;
   ptr += index;
   // id:
-  ptr->id = index + 1;
+  ptr->_id = index + 1;
   // name:
-  ptr->name = malloc(strlen(argv[arg_name]) + 1);
-  strcpy(ptr->name, argv[arg_name]);
+  ptr->_name = malloc(strlen(argv[POS_NAME]) + 1);
+  strcpy(ptr->_name, argv[POS_NAME]);
   // done:
   return 0;
 }
 
 int parse_class (void  *ext, int argc, str *argv, str *col) {
   const int
-    arg_id            = 0,
-    arg_name          = 1,
-    arg_abrv          = 2,
-    arg_class_type_id = 3,
-    arg_skill_ranks   = 4,
-    arg_source_id     = 5;
-  // setup:
-  int index = atoi(argv[arg_id]) - 1;
+    POS_ID            = 0,
+    POS_NAME          = 1,
+    POS_ABRV          = 2,
+    POS_CLASS_TYPE_ID = 3,
+    POS_SKILL_RANKS   = 4,
+    POS_SOURCE_ID     = 5;
+  
+  int index = atoi(argv[POS_ID]) - 1;
   class *ptr = (class*)ext;
   ptr += index;
-  // id:
-  ptr->id = index + 1;
-  // name:
-  ptr->name = malloc(strlen(argv[arg_name]) + 1);
-  strcpy(ptr->name, argv[arg_name]);
-  // abrv:
-  ptr->abrv = malloc(strlen(argv[arg_abrv]) + 1);
-  strcpy(ptr->abrv, argv[arg_abrv]);
-  // class_type_id:
-  ptr->class_type_id = (bit_8)atoi(argv[arg_class_type_id]);
-  // skill_ranks:
-  ptr->skill_ranks = (bit_8)atoi(argv[arg_skill_ranks]);
-  // source_id:
-  ptr->source_id = (bit_8)atoi(argv[arg_source_id]);
-  // done:
+
+  ptr->_id = index + 1;
+  ptr->_name = malloc(strlen(argv[POS_NAME]) + 1);
+  strcpy(ptr->_name, argv[POS_NAME]);
+
+  ptr->_abrv = malloc(strlen(argv[POS_ABRV]) + 1);
+  strcpy(ptr->_abrv, argv[POS_ABRV]);
+
+  ptr->_class_type_id = atoi(argv[POS_CLASS_TYPE_ID]);
+  ptr->_skill_ranks = atoi(argv[POS_SKILL_RANKS]);
+  ptr->_source_id = atoi(argv[POS_SOURCE_ID]);
+
   return 0;
 }
 
@@ -93,23 +90,23 @@ void free_classes() {
 
 /////////////////////////////////////////////////
 
-void print_class_types() {
-  for(int i=0; i < num_class_types; i++) {
-    printf ("- class_types[%d] -\n", i);
-    printf ("  id   = %d\n", class_types[i].id);
-    printf ("  name = %s\n", class_types[i].name);
-  }
+byte get_num_classes () {
+  return num_classes;
 }
 
-void print_classes() {
-  for(int i=0; i < num_classes; i++) {
-    printf ("- classes[%d] -\n", i);
-    printf ("  id = %d\n", classes[i].id);
-    printf ("  name = %s\n", classes[i].name);
-    printf ("  abrv = %s\n", classes[i].abrv);
-    printf ("  class type id = %d\n", classes[i].class_type_id);
-    printf ("  ranks/level = %d\n", classes[i].skill_ranks);
-    printf ("  source id = %d\n", classes[i].source_id);
-  }
+str to_str_class_type (class_type_id _class_type_id) {
+  return class_types[id_to_index(_class_type_id)]._name;
+}
+
+str to_str_class(class_id _class_id) {
+  return classes[id_to_index(_class_id)]._name;
+}
+
+class_id get_id_class (str _str){
+  for(int i = 0; i < num_classes; i++)
+    if(_str[0] == classes[i]._name[0] && strcmp(_str, classes[i]._name) == 0)
+      return classes[i]._id;
+  fprintf(stderr, "%s:%s() ERROR, %s not found as a name in classes\n", __FILE__, __func__, _str);
+  return -1;
 }
 
