@@ -11,7 +11,7 @@ struct spell {
   school_id  _school_id    : SCHOOL_ID_BIT;
   id_group * _subschool_id;
   id_group * _descriptor_id;
-  sl_group * _spell_levels;
+  SL_group * _spell_levels;
   str _casting_time;          // struct
   str _components_text;       // text
   bit_8  _range_id;            // struct, enclosing enum CLOSE, MEDIUM, LONG
@@ -44,7 +44,6 @@ void process_descriptor_ids (spell *ptr, str *argv, str *col, int length);
 void process_spell_levels   (spell *ptr, str *argv, str *col, int length);
 void process_subschool_ids  (spell *ptr, str arg_str);
 int parse_spell (void *ext, int argc, str *argv, str *col) {
-  printf("%s:%s() ENTRY\n", __FILE__, __func__);
   const int
     POS_ID                = 0,
     POS_NAME              = 1,
@@ -70,22 +69,17 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
   process_descriptor_ids(ptr, &argv[POS_DESCRIPTOR_START], &col[POS_DESCRIPTOR_START], POS_DESCRIPTOR_END - POS_DESCRIPTOR_START);
   // spell_levels:
   process_spell_levels(ptr, &argv[POS_SPELL_LEVEL_START], &col[POS_SPELL_LEVEL_START], POS_SPELL_LEVEL_END - POS_SPELL_LEVEL_START);
-
   // done:
   return 0;
-  printf("%s:%s() EXIT\n", __FILE__, __func__);
 }
 
 spell *load_spell(spell_id id) {
-  printf("%s:%s() ENTRY\n", __FILE__, __func__);
   spell *out = (spell*) load_by_id ("Pathfinder.db", "spell", parse_spell, sizeof(spell), id);
   print_spell(out);
   return out;
-  printf("%s:%s() EXIT\n", __FILE__, __func__);
 }
 
 void print_spell (spell *spell_ref) {
-  printf("%s:%s() ENTRY\n", __FILE__, __func__);
   printf("%s\n", spell_ref->_name);
   printf("School %s", get_name_school(spell_ref->_school_id));
   if(spell_ref->_subschool_id) {
@@ -99,11 +93,14 @@ void print_spell (spell *spell_ref) {
     free(descriptor_str);
   }
   printf(";\n");
-  printf("%s:%s() EXIT\n", __FILE__, __func__);
+  if(spell_ref->_spell_levels) {
+    str spell_levels_str = to_str_spell_level_group(spell_ref->_spell_levels);
+    printf("Level %s;\n", spell_levels_str);
+    free(spell_levels_str);
+  }
 }
 
 void process_descriptor_ids(spell *ptr, str *argv, str *col, int length) {
-  printf("%s:%s() ENTRY\n", __FILE__, __func__);
   byte
     ids[get_num_descriptors()],
     id_count = 0;
@@ -117,11 +114,9 @@ void process_descriptor_ids(spell *ptr, str *argv, str *col, int length) {
   }
   else
     ptr->_descriptor_id = NULL;
-   printf("%s:%s() EXIT\n", __FILE__, __func__);
 }
 
 void process_spell_levels(spell *ptr, str *argv, str *col, int length) {
-  printf("%s:%s() ENTRY\n", __FILE__, __func__);
   byte
     class_ids [get_num_classes()],
     levels [get_num_classes()],
@@ -139,7 +134,6 @@ void process_spell_levels(spell *ptr, str *argv, str *col, int length) {
   }
   else
     ptr->_spell_levels = NULL;
-  printf("%s:%s() EXIT\n", __FILE__, __func__);
 }
 
 void process_subschool_ids(spell *ptr, str arg_str) {

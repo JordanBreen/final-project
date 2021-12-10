@@ -1,7 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "spell_level.h"
 #include "buf_def.h"
+
 struct spell_level {
   level    _level    : SPELL_LEVEL_BIT;
   class_id _class_id : CLASS_ID_BIT;
@@ -44,9 +46,22 @@ void free_spell_level (spell_level **spell_level_ref) {
   *spell_level_ref = NULL;
 }
 
-str to_str_spell_levelc(spell_level *spell_level_ref) {
+str to_str_spell_level(spell_level *spell_level_ref) {
   buf buffer = "";
   sprintf(buffer, "%s %d", to_str_class(spell_level_ref->_class_id), spell_level_ref->_level);
+  str ret_str = malloc(strlen(buffer)+1);
+  strcpy(ret_str, buffer);
+  return ret_str;
+}
+
+str to_str_spell_level_group(spell_level_group *spell_level_group_ref) {
+  buf buffer = "";
+  str catch;
+  for(int i = 0; i < spell_level_group_ref->_size; i++) {
+    catch = to_str_spell_level(spell_level_group_ref->_spell_level_refs[i]);
+    sprintf(buffer, (i==spell_level_group_ref->_size-1) ? "%s%s" : "%s%s, ", buffer, catch);
+    free(catch);
+  }
   str ret_str = malloc(strlen(buffer)+1);
   strcpy(ret_str, buffer);
   return ret_str;
@@ -64,6 +79,6 @@ int valid_spell_level (level _level) {
   return (_level >= MIN_SPELL_LEVEL && _level <= MAX_SPELL_LEVEL);
 }
 
-size_t get_sizeof_spell_level() {
+size_t get_size_of_spell_level() {
   return sizeof(spell_level);
 }
