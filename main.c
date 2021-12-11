@@ -4,8 +4,30 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include "spell.h"
+
+static const void(*initializers[])() = {
+  init_class_types,
+  init_classes,
+  init_descriptors,
+  init_ranges,
+  init_schools,
+  init_subschools,
+  init_time_units
+};
+
+static const void(*destroyers[])() = {
+  free_class_types,
+  free_classes,
+  free_descriptors,
+  free_ranges,
+  free_schools,
+  free_subschools,
+  free_time_units
+};
+
 void init_resources();
 void free_resources();
+
 int main()
 {
   init_resources();
@@ -52,21 +74,13 @@ int main()
   free_resources();
   return 0;
 }
+
 void init_resources() {
-  init_class_types();
-  init_classes();
-  init_descriptors();
-  init_ranges();
-  init_schools();
-  init_subschools();
-  init_time_units();
+  for(int i = 0; i < sizeof(initializers)/sizeof(*initializers); i++)
+    (*initializers[i])();
 }
+
 void free_resources() {
-  free_class_types();
-  free_classes();
-  free_descriptors();
-  free_ranges();
-  free_schools();
-  free_subschools();
-  free_time_units();
+  for(int i = 0; i < sizeof(destroyers)/sizeof(*destroyers); i++)
+    (*destroyers[i])();
 }
