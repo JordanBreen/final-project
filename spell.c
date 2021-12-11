@@ -4,6 +4,29 @@
 #include "sqlite_loader.h"
 #include "spell.h"
 #include "buf_def.h"
+
+struct spell_attributes {
+  byte
+    _spell_resistance : 2,
+    _shapeable        : 1,
+    _dismissable      : 1,
+    _mythic           : 1;
+};
+
+struct spell_components {
+  byte
+    _verbal       : 1,
+    _somatic      : 1,
+    _material     : 1,
+    _focus        : 1,
+    _divine_focus : 1,
+    _is_costly    : 1;
+  bit_16
+    _cost;
+  str
+    _name;
+};
+
 struct spell {
 //type - identifier ------------ storage
   spell_id   _id           : SPELL_ID_BIT;               // max 65,535 spells, expecting ~2,900 spells
@@ -12,32 +35,34 @@ struct spell {
   id_group * _subschool_id;
   id_group * _descriptor_id;
   SL_group * _spell_levels;
-  str _casting_time;          // struct
-  str _components_text;       // text
-  bit_8  _range_id;            // struct, enclosing enum CLOSE, MEDIUM, LONG
-  str _area;                  // struct
-  str _effect;                // struct
-  str _targets;               // struct
-  str _duration;              // struct
-  str _saving_throw;          // struct
-  str _description_full;      // string
-  str _description_short;     // string
-  str _description_formatted; // string
-  str _source;                // enum
-  str _full_text;             // string
+  SL       * _SLA_level;
 
-  spell_component_flags _components;
-  spell_attribute_flags _attributes;
-  //spell_level_by_class  _level_by_class;
+  id_group * _casting_time_id; // TO-DO
+  str        _components_text;
+  id_group * _range_id;            // struct, enclosing enum CLOSE, MEDIUM, LONG
+  str _area_text;                  // struct
+  str _effect_text;                // struct
+  str _targets_text;          // struct
+  str _duration_text;         // struct
+  str _saving_throw_text;     // struct
+  str _source_text;
 
-  str _SLA_level;             // possible part of another flag structure
+  // text: /////////////////////
+  str _description_brief;
+  str _description_full;
+  str _description_format;
+  str _full_text;
+  str _link_text;
+
+  spell_components _components;
+  spell_attributes _attributes;
+
   str _domain_text;           // string
   str _bloodline_text;        // string
   str _patron_text;           // string
   str _mythic_text;           // string
   str _mythic_augment_text;   // string
-  //spell_descriptor_flags _descriptors;       // bool flag,  expecting 28 descriptors, 28 bits == >3 bytes, unsigned int, assert 4-byte int
-  unsigned short _material_cost;     // possible NULL value;
+  bit_16 _material_cost;     // possible NULL value;
 };
 
 void process_descriptor_ids (spell *ptr, str *argv, str *col, int length);
@@ -49,26 +74,93 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
     POS_NAME              = 1,
     POS_SCHOOL_ID         = 2,
     POS_SUBSCHOOL_ID      = 3,
+    POS_CASTING_TIME_ID   = 4,
+    // Components: ///////////
+    POS_COMPONENTS_TEXT   = 5,
+    POS_VERBAL            = 6,
+    POS_SOMATIC           = 7,
+    POS_MATERIAL          = 8,
+    POS_MATERIAL_COST     = 9,
+    POS_MATERIAL_COSTLY   = 10,
+    POS_FOCUS             = 11,
+    POS_DIVINE_FOCUS      = 12,
+    // Text: //////////////////
+    POS_RANGE_TEXT        = 13,
+    POS_AREA_TEXT         = 14,
+    POS_EFFECT_TEXT       = 15,
+    POS_TARGETS_TEXT      = 16,
+    POS_DURATION_TEXT     = 17,
+    POS_DISMISSABLE       = 18,
+    POS_SHAPEABLE         = 19,
+    POS_SAVING_THROW_TEXT = 20,
+    POS_SPELL_RESIST_TEXT = 21,
+    POS_SOURCE_TEXT       = 22,
+    POS_DESCRIPTION_BRIEF = 23,
+    POS_DESCRIPTION_FULL  = 24,
+    POS_DESCRIPTION_FORM  = 25,
+    POS_FULL_TEXT         = 26,
+    POS_LINK_TEXT         = 27,
+    // Spell Levels: //////////
     POS_SPELL_LEVEL_START = 28,
     POS_SPELL_LEVEL_END   = 53,
+    POS_DEITY_LEVEL       = 54,
+    POS_SLA_LEVEL         = 55,
+    // Descriptors: ///////////
     POS_DESCRIPTOR_START  = 56,
-    POS_DESCRIPTOR_END    = 83;
+    POS_DESCRIPTOR_END    = 83,
+    // Etc: ///////////////////
+    POS_BLOODLINE_TEXT    = 84,
+    POS_DOMAIN_TEXT       = 85,
+    POS_PATRON_TEXT       = 86,
+    POS_MYTHIC            = 87,
+    POS_MYTHIC_TEXT       = 88,
+    POS_AUGMENTED_TEXT    = 89,
+    POS_HAUNT_STAT_TEXT   = 90;
   // setup:
   int index = atoi(argv[POS_ID]) - 1;
   spell *ptr = (spell*)ext;
-  // id:
+
   ptr->_id = index + 1;
-  // name:
-  ptr->_name = malloc(strlen(argv[POS_NAME]) + 1);
-  strcpy(ptr->_name, argv[POS_NAME]);
-  // school_id:
-  ptr->_school_id = (school_id)atoi(argv[POS_SCHOOL_ID]);
-  // subschool_ids:
+  ptr->_name = str_clone(argv[POS_NAME]);
+  ptr->_school_id = atoi(argv[POS_SCHOOL_ID]);
   process_subschool_ids(ptr, argv[POS_SUBSCHOOL_ID]);
-  // descriptor_ids:
   process_descriptor_ids(ptr, &argv[POS_DESCRIPTOR_START], &col[POS_DESCRIPTOR_START], POS_DESCRIPTOR_END - POS_DESCRIPTOR_START);
-  // spell_levels:
   process_spell_levels(ptr, &argv[POS_SPELL_LEVEL_START], &col[POS_SPELL_LEVEL_START], POS_SPELL_LEVEL_END - POS_SPELL_LEVEL_START);
+
+  // components:
+  ptr->_components_text       = str_clone(argv[POS_COMPONENTS_TEXT]);
+  ptr->_components._verbal    = atoi(argv[POS_VERBAL]);
+  ptr->_components._somatic   = atoi(argv[POS_SOMATIC]);
+  ptr->_components._material  = atoi(argv[POS_MATERIAL]);
+  ptr->_components._focus     = atoi(argv[POS_FOCUS]);
+  ptr->_components._is_costly = atoi(argv[POS_MATERIAL_COSTLY]);
+  ptr->_components._cost      = (argv[POS_MATERIAL_COST]) ? atoi(argv[POS_MATERIAL_COST]) : 0;
+  ptr->_components._name      = NULL;
+
+  // attributes:
+  ptr->_attributes._spell_resistance = 0;
+  ptr->_attributes._dismissable = atoi(argv[POS_DISMISSABLE]);
+  ptr->_attributes._shapeable   = atoi(argv[POS_SHAPEABLE]);
+  ptr->_attributes._mythic      = atoi(argv[POS_MYTHIC]);
+  
+  ptr->_area_text = str_clone(argv[POS_AREA_TEXT]);
+  ptr->_effect_text = str_clone(argv[POS_EFFECT_TEXT]);
+  ptr->_targets_text = str_clone(argv[POS_TARGETS_TEXT]);
+  ptr->_duration_text = str_clone(argv[POS_DURATION_TEXT]);
+  ptr->_saving_throw_text = str_clone(argv[POS_SAVING_THROW_TEXT]);
+
+  // description text:
+  ptr->_description_brief  = str_clone(argv[POS_DESCRIPTION_BRIEF]);
+  ptr->_description_full   = str_clone(argv[POS_DESCRIPTION_FULL]);
+  ptr->_description_format = str_clone(argv[POS_DESCRIPTION_FORM]);
+
+  // other text:
+  ptr->_full_text = str_clone(argv[POS_FULL_TEXT]);
+  ptr->_link_text = str_clone(argv[POS_LINK_TEXT]);
+
+  ptr->_source_text = str_clone(argv[POS_SOURCE_TEXT]);
+  ptr->_domain_text = str_clone(argv[POS_DOMAIN_TEXT]);
+  ptr->_bloodline_text = str_clone(argv[POS_BLOODLINE_TEXT]);
   // done:
   return 0;
 }

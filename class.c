@@ -31,16 +31,14 @@ int parse_class_type (void  *ext, int argc, str *argv, str *col) {
   const int
     POS_ID   = 0,
     POS_NAME = 1;
-  // setup:
+  
   int index = atoi(argv[POS_ID]) - 1;
   class_type *ptr = (class_type*)ext;
   ptr += index;
-  // id:
+  
   ptr->_id = index + 1;
-  // name:
-  ptr->_name = malloc(strlen(argv[POS_NAME]) + 1);
-  strcpy(ptr->_name, argv[POS_NAME]);
-  // done:
+  ptr->_name = str_clone(argv[POS_NAME]);
+
   return 0;
 }
 
@@ -58,12 +56,8 @@ int parse_class (void  *ext, int argc, str *argv, str *col) {
   ptr += index;
 
   ptr->_id = index + 1;
-  ptr->_name = malloc(strlen(argv[POS_NAME]) + 1);
-  strcpy(ptr->_name, argv[POS_NAME]);
-
-  ptr->_abrv = malloc(strlen(argv[POS_ABRV]) + 1);
-  strcpy(ptr->_abrv, argv[POS_ABRV]);
-
+  ptr->_name = str_clone(argv[POS_NAME]);
+  ptr->_abrv = str_clone(argv[POS_ABRV]);
   ptr->_class_type_id = atoi(argv[POS_CLASS_TYPE_ID]);
   ptr->_skill_ranks = atoi(argv[POS_SKILL_RANKS]);
   ptr->_source_id = atoi(argv[POS_SOURCE_ID]);

@@ -11,7 +11,7 @@ static school *schools     = NULL;
 //////////////////////////////////////////////
 
 struct school {
-  school_id id : 4; // exp: 10 
+  school_id id : SCHOOL_ID_BIT; // exp: 10 
   str name;         // varied
 };
 
@@ -21,16 +21,14 @@ int parse_school (void *ext, int argc, str *argv, str *col) {
   const int
     arg_id   = 0,
     arg_name = 1;
-  // setup:
+
   int index = atoi(argv[arg_id]) - 1;
   school *ptr = (school*)ext;
   ptr += index;
-  // id:
+  
   ptr->id = index + 1;
-  // name:
-  ptr->name = malloc(strlen(argv[arg_name]) + 1);
-  strcpy(ptr->name, argv[arg_name]);
-  // done:
+  ptr->name = str_clone(argv[arg_name]);
+
   return 0;
 }
 
@@ -49,8 +47,8 @@ void free_schools () {
 str get_name_school (school_id id) {
   return schools[id_to_index(id)].name;
 }
-void print_school ( bit_8 id ) {
-  printf ("- school [%d] %s\n", schools[id_to_index(id)].id, schools[id_to_index(id)].name);
+void print_school (school_id id) {
+  printf ("%s\n", schools[id_to_index(id)].name);
 }
 
 void print_schools () {

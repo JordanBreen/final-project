@@ -118,3 +118,11 @@ int get_table_size (sqlite3 *db, const str db_file_name, const str db_table_name
   }
   return out_size;
 }
+
+str str_clone(str arg_str) {
+  if(!arg_str)
+    return NULL;
+  str ret_str = malloc(strlen(arg_str) + 1);
+  strcpy(ret_str, arg_str);
+  return ret_str;
+}

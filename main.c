@@ -11,7 +11,7 @@ int main()
   init_resources();
 
   spell *test;
-  for(int i = 1; i <= 200; i++) {
+  for(int i = 1; i <= 1; i++) {
    test = load_spell(i);
    free(test);
   }

@@ -12,11 +12,12 @@ static subschool
   *subschools = NULL;
 static id_group
   *subschool_id_groups = NULL;
+
 //////////////////////////////////////////////
 
 struct subschool {
-  subschool_id id : SUBSCHOOL_ID_BIT;        // for personal id 
-  str          name;          // varied
+  subschool_id id : SUBSCHOOL_ID_BIT;     // for personal id 
+  str          name;                      // varied
   school_id    school_id : SCHOOL_ID_BIT; // exp: 16
 };
 
@@ -31,17 +32,16 @@ int parse_subschool (void *ext, int argc, str *argv, str *col) {
   int index = id_to_index(atoi(argv[arg_id]));
   subschool *ptr = (subschool*)ext;
   ptr += index;
-  // id:
-  ptr->id = index_to_id(index);
-  // name:
-  ptr->name = malloc(strlen(argv[arg_name]) + 1);
-  strcpy(ptr->name, argv[arg_name]);
-  // school_id: danger possible NULL
-  if (argv[arg_school_id] == NULL)
+
+  ptr->id   = index_to_id(index);
+  ptr->name = str_clone(argv[arg_name]);
+
+  // school_id: DANGER possible NULL
+  if (!argv[arg_school_id])
     num_subschool_id_groups++;
-  else // parse as normal, found a normal subschool
+  else
     ptr->school_id = atoi(argv[arg_school_id]);
-  // done:
+
   return 0;
 }
 int parse_subschool_id_group (void *ext, int argc, str *argv, str *col) {

@@ -26,25 +26,20 @@ struct time_block {
 
 int parse_time_unit (void *ext, int argc, str *argv, str *col) {
   const int
-    arg_id   = 0,
-    arg_name = 1,
-    arg_abrv = 2,
-    arg_secs = 3;
-  // setup:
-  int index = atoi(argv[arg_id]) - 1;
+    POS_ID   = 0,
+    POS_NAME = 1,
+    POS_ABRV = 2,
+    POS_SECS = 3;
+
+  int index = atoi(argv[POS_ID]) - 1;
   time_unit *ptr = (time_unit*)ext;
   ptr += index;
-  // id:
+
   ptr->id = index + 1;
-  // name:
-  ptr->name = malloc(strlen(argv[arg_name]) + 1);
-  strcpy(ptr->name, argv[arg_name]);
-  // abrv:
-  ptr->abrv = malloc(strlen(argv[arg_abrv]) + 1);
-  strcpy(ptr->abrv, argv[arg_abrv]);
-  // secs:
-  ptr->secs = atoi(argv[arg_secs]);
-  // done:
+  ptr->name = str_clone(argv[POS_NAME]);
+  ptr->abrv = str_clone(argv[POS_ABRV]);
+  ptr->secs = atoi(argv[POS_SECS]);
+
   return 0;
 }
 

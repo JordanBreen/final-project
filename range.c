@@ -28,15 +28,14 @@ int parse_range (void  *ext, int argc, str *argv, str *col) {
     arg_base = 2,
     arg_plus = 3,
     arg_rate = 4;
-  // setup:
+
   int index = atoi(argv[arg_id]) - 1;
   range *ptr = (range*)ext;
   ptr += index;
-  // id:
+
   ptr->id = index + 1;
-  // name:
-  ptr->name = malloc(strlen(argv[arg_name]) + 1);
-  strcpy(ptr->name, argv[arg_name]);
+  ptr->name = str_clone(argv[arg_name]);
+
   // testing base column:
   if(argv[arg_base] == NULL) { // fixed range
     ptr->fixed = 1;
@@ -50,7 +49,7 @@ int parse_range (void  *ext, int argc, str *argv, str *col) {
     ptr->plus = atoi(argv[arg_plus]);
     ptr->rate = atoi(argv[arg_rate]);
   }
-  // done:
+
   return 0;
 }
 

@@ -10,5 +10,5 @@ extern void* load_by_id      (const str, const str, int(*)(void*, int, str*, str
 extern int   peek_table_size (const str, const str);
 extern int   get_table_size  (sqlite3*, const str, const str);
 extern void  close_loader    (str,  sqlite3*);
-
+extern str   str_clone       (str);
 #endif
