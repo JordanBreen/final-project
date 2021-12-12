@@ -4,8 +4,8 @@
 #include "sqlite_loader.h"
 #include "class.h"
 #include "index.h"
-static byte        num_class_types = 0;
-static byte        num_classes     = 0;
+static int        num_class_types = 0;
+static int        num_classes     = 0;
 static class_type *class_types     = NULL;
 static class      *classes         = NULL;
 
@@ -68,11 +68,10 @@ int parse_class (void  *ext, int argc, str *argv, str *col) {
 ////////////////////////////////////////////////
 
 void init_class_types() {
-  class_types = (class_type*) load_table ("Pathfinder.db", "class_type", parse_class_type, sizeof(class_type), (int*) &num_class_types);
+  class_types = (class_type*) load_table ("class_type", parse_class_type, sizeof(class_type), &num_class_types);
 }
 void init_classes() {
-  classes = (class*) load_table ("Pathfinder.db", "class", parse_class, sizeof(class), (int*) &num_classes);
-  printf("%s:%s(): COMPLETE\n", __FILE__, __func__);
+  classes = (class*) load_table ("class", parse_class, sizeof(class), &num_classes);
 }
 
 void free_class_types() {
@@ -98,10 +97,10 @@ str to_str_class(class_id _class_id) {
 }
 
 class_id get_id_class (str _str){
-  printf("%s:%s(str _str = %s): looking for _str in class[...].name\n", __FILE__, __func__, _str);
-  for(int i = 0; i < num_classes; i++)
+  for(int i = 0; i < num_classes; i++) {
     if(_str[0] == classes[i]._name[0] && strcmp(_str, classes[i]._name) == 0)
       return classes[i]._id;
+  }
   fprintf(stderr, "%s:%s() ERROR, %s not found as a name in classes\n", __FILE__, __func__, _str);
   return -1;
 }

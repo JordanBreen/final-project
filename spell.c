@@ -174,14 +174,13 @@ int  parse_spell (void *ext, int argc, str *argv, str *col) {
 }
 
 spell *load_spell(spell_id id) {
-  spell *out = (spell*) load_by_id ("Pathfinder.db", "spell", parse_spell, sizeof(spell), id);
+  spell *out = (spell*) load_by_id ("spell", parse_spell, sizeof(spell), id);
   print_spell(out);
   return out;
 }
 
 // print ///////////////////////////////////////////////////////////////////
 void print_spell (spell *spell_ref) {
-
   // BASIC INFO ////////////////////////////////////
   // name
   printf("%s\n", spell_ref->_name);

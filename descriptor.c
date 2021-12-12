@@ -5,7 +5,7 @@
 #include "descriptor.h"
 #include "index.h"
 
-static bit_8       num_descriptors = 0;
+static int         num_descriptors = 0;
 static descriptor *descriptors     = NULL;
 
 //////////////////////////////////////////////
@@ -35,7 +35,7 @@ int parse_descriptor (void  *ext, int argc, str *argv, str *col) {
 ////////////////////////////////////////////////
 
 void init_descriptors() {
-  descriptors = (descriptor*) load_table ("Pathfinder.db", "descriptor", parse_descriptor, sizeof(descriptor), (int*) &num_descriptors);
+  descriptors = (descriptor*) load_table ("descriptor", parse_descriptor, sizeof(descriptor), &num_descriptors);
 }
 
 void free_descriptors() {

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "thread.h"
 #include "resource.h"
-
+#include "sqlite_loader.h"
 static thread *threads;
 static byte num_threads;
 static pthread_barrier_t barrier;
@@ -74,7 +74,6 @@ void* _init_resources(void *ext) {
     set_num_tasks(_num_tasks);
   pthread_barrier_wait(&barrier);
   while ((_task_index = get_task()) != -1) {
-    printf("%s:%s():Thread [%d]: processing task initializers[%d]\n", __FILE__, __func__, _thread->_id, _task_index);
     _tasks[_task_index]();
   }
   return NULL;
@@ -106,9 +105,11 @@ void destroy_threads() {
 }
 
 void init_resources(byte arg_num_threads) {
+  db_open("Pathfinder.db");
   init_threads(arg_num_threads);
   process_threads(_init_resources);
-  destroy_threads();
+  destroy_threads(); 
+  db_close(NULL);
 }
 
 void free_resources(byte arg_num_threads) {
@@ -116,3 +117,12 @@ void free_resources(byte arg_num_threads) {
   process_threads(_free_resources);
   destroy_threads();
 }
+
+void load_spells(byte arg_num_threads) {
+  db_open("Pathfinder.db");
+  init_threads(arg_num_threads);
+  //process_threads(_init_resources);
+  destroy_threads();
+  db_close(NULL);
+}
+

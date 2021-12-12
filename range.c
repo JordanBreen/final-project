@@ -6,7 +6,7 @@
 #include "sqlite_loader.h"
 
 
-static bit_8  num_ranges = 0;
+static int    num_ranges = 0;
 static range *ranges     = NULL;
 
 //////////////////////////////////////////////
@@ -58,7 +58,7 @@ int parse_range (void *ext, int argc, str *argv, str *col) {
 ////////////////////////////////////////////////
 
 void init_ranges () {
-  ranges = (range*) load_table ("Pathfinder.db", "range", parse_range, sizeof(range), (int*) &num_ranges);
+  ranges = (range*) load_table ("range", parse_range, sizeof(range), &num_ranges);
 }
 
 void free_ranges () {

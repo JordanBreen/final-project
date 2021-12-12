@@ -5,7 +5,7 @@
 #include "sqlite_loader.h"
 #include "time_unit.h"
 
-static byte_1 num_time_units = 0;
+static int        num_time_units = 0;
 static time_unit *time_units = NULL;
 
 // Struct Definitions: /////////////////////////////////////////
@@ -46,7 +46,7 @@ int parse_time_unit (void *ext, int argc, str *argv, str *col) {
 // Constructors: ////////////////////////////////////////////////////////
 
 void init_time_units() {
-  time_units = (time_unit*) load_table ("Pathfinder.db", "time_unit", parse_time_unit, sizeof(time_unit), (int*) &num_time_units);
+  time_units = (time_unit*) load_table ("time_unit", parse_time_unit, sizeof(time_unit), &num_time_units);
 }
 
 time_block *new_time_block (int arg_factor, int arg_time_unit_id) {

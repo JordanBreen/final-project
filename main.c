@@ -15,12 +15,13 @@ int main()
 {
   init_resources(NUM_THREADS);
 
+  //printf("number of classes = %d\n", get_num_classes());
   //print_classes();
-
-  
+  //printf("press any key to continue: ");
+  //printf("%c\n", getc(stdin));
   
   spell *test;
-  for(int i = 1; i <= 1; i++) {
+  for(int i = 1; i <= 2000; i++) {
    test = load_spell(i);
    free(test);
   }

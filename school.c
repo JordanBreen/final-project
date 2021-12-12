@@ -5,7 +5,7 @@
 #include "school.h"
 #include "index.h"
 
-static bit_8   num_schools = 0;
+static int    num_schools = 0;
 static school *schools     = NULL;
 
 //////////////////////////////////////////////
@@ -35,7 +35,7 @@ int parse_school (void *ext, int argc, str *argv, str *col) {
 ////////////////////////////////////////////////
 
 void init_schools () {
-  schools = (school*) load_table ("Pathfinder.db", "school", parse_school, sizeof(school), (int*) &num_schools);
+  schools = (school*) load_table ("school", parse_school, sizeof(school), &num_schools);
 }
 
 void free_schools () {

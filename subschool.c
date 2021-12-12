@@ -5,7 +5,7 @@
 #include "subschool.h"
 #include "index.h"
 
-static bit_8
+static int
   num_subschools          = 0,
   num_subschool_id_groups = 0;
 static subschool
@@ -73,7 +73,7 @@ int parse_subschool_id_group (void *ext, int argc, str *argv, str *col) {
 ////////////////////////////////////////////////
 
 void init_subschools () {
-  subschools = (subschool*) load_table ("Pathfinder.db", "subschool", parse_subschool, sizeof(subschool), (int*)&num_subschools);
+  subschools = (subschool*) load_table ("subschool", parse_subschool, sizeof(subschool), &num_subschools);
   num_subschools -= num_subschool_id_groups;
   subschools = realloc(subschools, sizeof(subschool) * num_subschools);
   if(!subschools) {
@@ -81,7 +81,7 @@ void init_subschools () {
     exit(1);
   }
   subschool_id_groups = malloc(get_size_of_id_group() * num_subschool_id_groups); 
-  load_table ("Pathfinder.db", "subschool_group", parse_subschool_id_group, get_size_of_id_group(), (int*)&num_subschool_id_groups);
+  load_table ("subschool_group", parse_subschool_id_group, get_size_of_id_group(), &num_subschool_id_groups);
 }
 
 void free_subschools () {
