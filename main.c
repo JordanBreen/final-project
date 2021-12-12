@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
+#include <time.h>
 #include "spell.h"
 #include "thread.h"
 #include "bit_def.h"
@@ -13,6 +15,10 @@ int main()
 {
   init_resources(NUM_THREADS);
 
+  //print_classes();
+
+  
+  
   spell *test;
   for(int i = 1; i <= 1; i++) {
    test = load_spell(i);

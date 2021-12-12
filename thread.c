@@ -73,8 +73,10 @@ void* _init_resources(void *ext) {
   if(_thread->_id == MASTER)
     set_num_tasks(_num_tasks);
   pthread_barrier_wait(&barrier);
-  while ((_task_index = get_task()) != -1)
+  while ((_task_index = get_task()) != -1) {
+    printf("%s:%s():Thread [%d]: processing task initializers[%d]\n", __FILE__, __func__, _thread->_id, _task_index);
     _tasks[_task_index]();
+  }
   return NULL;
 }
 
@@ -94,8 +96,11 @@ void* _free_resources(void *ext) {
 }
 
 void destroy_threads() {
-  for (int i = 0; i < num_threads; i++)
+  for (int i = 0; i < num_threads; i++) {
+    if (i != MASTER)
+      pthread_cancel(threads[i]._handle);
     pthread_join(threads[i]._handle, NULL);
+  }
   pthread_barrier_destroy(&barrier);
   pthread_mutex_destroy(&mutex);
 }

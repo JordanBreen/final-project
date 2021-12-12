@@ -22,4 +22,6 @@ extern str to_str_class (class_id);
 extern byte     get_num_classes();
 extern class_id get_id_class (str);
 
+extern void print_classes();
+
 #endif

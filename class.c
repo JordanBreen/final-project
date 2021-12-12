@@ -72,6 +72,7 @@ void init_class_types() {
 }
 void init_classes() {
   classes = (class*) load_table ("Pathfinder.db", "class", parse_class, sizeof(class), (int*) &num_classes);
+  printf("%s:%s(): COMPLETE\n", __FILE__, __func__);
 }
 
 void free_class_types() {
@@ -97,10 +98,17 @@ str to_str_class(class_id _class_id) {
 }
 
 class_id get_id_class (str _str){
+  printf("%s:%s(str _str = %s): looking for _str in class[...].name\n", __FILE__, __func__, _str);
   for(int i = 0; i < num_classes; i++)
     if(_str[0] == classes[i]._name[0] && strcmp(_str, classes[i]._name) == 0)
       return classes[i]._id;
   fprintf(stderr, "%s:%s() ERROR, %s not found as a name in classes\n", __FILE__, __func__, _str);
   return -1;
 }
+
+void print_classes () {
+  for(int i = 1; i <= num_classes; i++)
+    printf("%s\n", to_str_class(i));
+}
+  
 
