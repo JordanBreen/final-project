@@ -5,17 +5,10 @@
 #include "spell.h"
 #include "buf_def.h"
 
-// Headers:
-static const str DIVIDER = "----------------------------------------\n";
-
-static buf
-  CASTING_HEADER,
-  EFFECT_HEADER,
-  DESCRIPTION_HEADER;
-
-sprintf(CASTING_HEADER,     "%sCASTING%s",     DIVIDER, DIVIDER);
-sprintf(EFFECT_HEADER,      "%sEFFECT%s",      DIVIDER, DIVIDER);
-sprintf(DESCRIPTION_HEADER, "%sDESCRIPTION%s", DIVIDER, DIVIDER);
+const str
+  CASTING_HEADER = "CASTING",
+  EFFECT_HEADER = "EFFECT",
+  DESCRIPTION_HEADER = "DESCRIPTION";
 
 struct spell_attributes {
   byte

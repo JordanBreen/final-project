@@ -4,33 +4,14 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include "spell.h"
+#include "thread.h"
+#include "bit_def.h"
 
-static const void(*initializers[])() = {
-  init_class_types,
-  init_classes,
-  init_descriptors,
-  init_ranges,
-  init_schools,
-  init_subschools,
-  init_time_units
-};
-
-static const void(*destroyers[])() = {
-  free_class_types,
-  free_classes,
-  free_descriptors,
-  free_ranges,
-  free_schools,
-  free_subschools,
-  free_time_units
-};
-
-void init_resources();
-void free_resources();
+const byte NUM_THREADS = 4;
 
 int main()
 {
-  init_resources();
+  init_resources(NUM_THREADS);
 
   spell *test;
   for(int i = 1; i <= 1; i++) {
@@ -71,16 +52,6 @@ int main()
   wgetch(ui->cmd_window);
   endwin();
   */
-  free_resources();
+  free_resources(NUM_THREADS);
   return 0;
-}
-
-void init_resources() {
-  for(int i = 0; i < sizeof(initializers)/sizeof(*initializers); i++)
-    (*initializers[i])();
-}
-
-void free_resources() {
-  for(int i = 0; i < sizeof(destroyers)/sizeof(*destroyers); i++)
-    (*destroyers[i])();
 }

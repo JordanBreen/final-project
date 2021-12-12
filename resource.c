@@ -1,6 +1,6 @@
 #include "resource.h"
 
-static const task initializers[] = {
+static task initializers[] = {
   init_class_types,
   init_classes,
   init_descriptors,
@@ -10,7 +10,7 @@ static const task initializers[] = {
   init_time_units
 };
 
-static const task destructors[] = {
+static task destructors[] = {
   free_class_types,
   free_classes,
   free_descriptors,
