@@ -2,7 +2,7 @@
 #define SQL_LOADER_H
 #include <sqlite3.h>
 #include "str_def.h"
-
+#include "index.h"
 extern void  db_init         (sqlite3**, const str, sqlite3_stmt*); 
 extern int   count_rows      (void*, int, str*, str*);
 extern void* load_table      (const str, const str, int(*)(void*, int, str*, str*), size_t, int*);

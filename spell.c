@@ -5,6 +5,18 @@
 #include "spell.h"
 #include "buf_def.h"
 
+// Headers:
+static const str DIVIDER = "----------------------------------------\n";
+
+static buf
+  CASTING_HEADER,
+  EFFECT_HEADER,
+  DESCRIPTION_HEADER;
+
+sprintf(CASTING_HEADER,     "%sCASTING%s",     DIVIDER, DIVIDER);
+sprintf(EFFECT_HEADER,      "%sEFFECT%s",      DIVIDER, DIVIDER);
+sprintf(DESCRIPTION_HEADER, "%sDESCRIPTION%s", DIVIDER, DIVIDER);
+
 struct spell_attributes {
   byte
     _spell_resistance : 2,
@@ -37,12 +49,14 @@ struct spell {
   SL_group * _spell_levels;
   SL       * _SLA_level;
 
-  id_group * _casting_time_id; // TO-DO
+  byte       _casting_time_id; // TO-DO
   str        _components_text;
-  id_group * _range_id;            // struct, enclosing enum CLOSE, MEDIUM, LONG
+  //range_id   _range_id;            // struct, enclosing enum CLOSE, MEDIUM, LONG
+  str _range_text;
+  
   str _area_text;                  // struct
   str _effect_text;                // struct
-  str _targets_text;          // struct
+  str _target_text;          // struct
   str _duration_text;         // struct
   str _saving_throw_text;     // struct
   str _source_text;
@@ -68,7 +82,7 @@ struct spell {
 void process_descriptor_ids (spell *ptr, str *argv, str *col, int length);
 void process_spell_levels   (spell *ptr, str *argv, str *col, int length);
 void process_subschool_ids  (spell *ptr, str arg_str);
-int parse_spell (void *ext, int argc, str *argv, str *col) {
+int  parse_spell (void *ext, int argc, str *argv, str *col) {
   const int
     POS_ID                = 0,
     POS_NAME              = 1,
@@ -127,7 +141,8 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
   process_descriptor_ids(ptr, &argv[POS_DESCRIPTOR_START], &col[POS_DESCRIPTOR_START], POS_DESCRIPTOR_END - POS_DESCRIPTOR_START);
   process_spell_levels(ptr, &argv[POS_SPELL_LEVEL_START], &col[POS_SPELL_LEVEL_START], POS_SPELL_LEVEL_END - POS_SPELL_LEVEL_START);
 
-  // components:
+  // CASTING SECTION:
+  ptr->_casting_time_id       = atoi(argv[POS_CASTING_TIME_ID]);
   ptr->_components_text       = str_clone(argv[POS_COMPONENTS_TEXT]);
   ptr->_components._verbal    = atoi(argv[POS_VERBAL]);
   ptr->_components._somatic   = atoi(argv[POS_SOMATIC]);
@@ -137,31 +152,31 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
   ptr->_components._cost      = (argv[POS_MATERIAL_COST]) ? atoi(argv[POS_MATERIAL_COST]) : 0;
   ptr->_components._name      = NULL;
 
-  // attributes:
+  // EFFECT SECTION:
   ptr->_attributes._spell_resistance = 0;
   ptr->_attributes._dismissable = atoi(argv[POS_DISMISSABLE]);
   ptr->_attributes._shapeable   = atoi(argv[POS_SHAPEABLE]);
   ptr->_attributes._mythic      = atoi(argv[POS_MYTHIC]);
-  
-  ptr->_area_text = str_clone(argv[POS_AREA_TEXT]);
-  ptr->_effect_text = str_clone(argv[POS_EFFECT_TEXT]);
-  ptr->_targets_text = str_clone(argv[POS_TARGETS_TEXT]);
-  ptr->_duration_text = str_clone(argv[POS_DURATION_TEXT]);
+
+  ptr->_range_text        = str_clone(argv[POS_RANGE_TEXT]); // TEMP
+  ptr->_area_text         = str_clone(argv[POS_AREA_TEXT]);
+  ptr->_effect_text       = str_clone(argv[POS_EFFECT_TEXT]);
+  ptr->_target_text       = str_clone(argv[POS_TARGETS_TEXT]);
+  ptr->_duration_text     = str_clone(argv[POS_DURATION_TEXT]);
   ptr->_saving_throw_text = str_clone(argv[POS_SAVING_THROW_TEXT]);
 
-  // description text:
+  // DESCRIPTION SECTION:
   ptr->_description_brief  = str_clone(argv[POS_DESCRIPTION_BRIEF]);
   ptr->_description_full   = str_clone(argv[POS_DESCRIPTION_FULL]);
   ptr->_description_format = str_clone(argv[POS_DESCRIPTION_FORM]);
 
-  // other text:
-  ptr->_full_text = str_clone(argv[POS_FULL_TEXT]);
-  ptr->_link_text = str_clone(argv[POS_LINK_TEXT]);
-
-  ptr->_source_text = str_clone(argv[POS_SOURCE_TEXT]);
-  ptr->_domain_text = str_clone(argv[POS_DOMAIN_TEXT]);
+  // ETC:
+  ptr->_full_text      = str_clone(argv[POS_FULL_TEXT]);
+  ptr->_link_text      = str_clone(argv[POS_LINK_TEXT]);
+  ptr->_source_text    = str_clone(argv[POS_SOURCE_TEXT]);
+  ptr->_domain_text    = str_clone(argv[POS_DOMAIN_TEXT]);
   ptr->_bloodline_text = str_clone(argv[POS_BLOODLINE_TEXT]);
-  // done:
+  
   return 0;
 }
 
@@ -171,27 +186,69 @@ spell *load_spell(spell_id id) {
   return out;
 }
 
+// print ///////////////////////////////////////////////////////////////////
 void print_spell (spell *spell_ref) {
+
+  // BASIC INFO ////////////////////////////////////
+  // name
   printf("%s\n", spell_ref->_name);
+  // spell school
   printf("School %s", get_name_school(spell_ref->_school_id));
+  // spell subschool(s)
   if(spell_ref->_subschool_id) {
     str subschool_str = to_string_id_group(spell_ref->_subschool_id, get_name_subschool);
     printf(" (%s)", subschool_str);
     free(subschool_str);
   }
+  // spell descriptor(s)
   if(spell_ref->_descriptor_id) {
     str descriptor_str = to_string_id_group(spell_ref->_descriptor_id, get_name_descriptor);
     printf(" [%s]", descriptor_str);
     free(descriptor_str);
   }
+  // spell level(s)
   printf(";\n");
   if(spell_ref->_spell_levels) {
     str spell_levels_str = to_str_spell_level_group(spell_ref->_spell_levels);
     printf("Level %s;\n", spell_levels_str);
     free(spell_levels_str);
   }
+
+  // CASTING INFO //////////////////////////////////
+  printf("%s\n", CASTING_HEADER);
+  // casting time
+  if(spell_ref->_casting_time_id)
+    printf("Casting Time %d\n", spell_ref->_casting_time_id);
+  // components
+  if(spell_ref->_components_text)
+    printf("Components %s\n", spell_ref->_components_text);
+
+  // EFFECT INFO ///////////////////////////////////
+  printf("%s\n", EFFECT_HEADER);
+  // range
+  if(spell_ref->_range_text)
+    printf("Range %s\n", spell_ref->_range_text);
+  // target(s)
+  if(spell_ref->_target_text)
+    printf("Target %s\n", spell_ref->_target_text);
+  // duration
+  if(spell_ref->_duration_text)
+    printf("Duration %s\n", spell_ref->_duration_text);
+  // saving throw / spell_resistance 
+  if(spell_ref->_saving_throw_text)
+    printf("Saving Throw %s; Spell Resistance %s\n", spell_ref->_saving_throw_text, (spell_ref->_attributes._spell_resistance) ? "yes" : "no");
+
+  // DESCRIPTION INFO
+  printf("%s\n", DESCRIPTION_HEADER);
+  // full description
+  if(spell_ref->_description_full)
+    printf("%s\n", spell_ref->_description_full);
+
+  // END
+  printf("\n");
 }
 
+// processes /////////////////////////////////////////////////////////////
 void process_descriptor_ids(spell *ptr, str *argv, str *col, int length) {
   byte
     ids[get_num_descriptors()],
