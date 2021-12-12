@@ -100,7 +100,7 @@ int  parse_spell (void *ext, int argc, str *argv, str *col) {
     POS_DISMISSABLE       = 18,
     POS_SHAPEABLE         = 19,
     POS_SAVING_THROW_TEXT = 20,
-    POS_SPELL_RESIST_TEXT = 21,
+    //POS_SPELL_RESIST_TEXT = 21,
     POS_SOURCE_TEXT       = 22,
     POS_DESCRIPTION_BRIEF = 23,
     POS_DESCRIPTION_FULL  = 24,
@@ -110,19 +110,19 @@ int  parse_spell (void *ext, int argc, str *argv, str *col) {
     // Spell Levels: //////////
     POS_SPELL_LEVEL_START = 28,
     POS_SPELL_LEVEL_END   = 53,
-    POS_DEITY_LEVEL       = 54,
-    POS_SLA_LEVEL         = 55,
+    //POS_DEITY_LEVEL       = 54,
+    //POS_SLA_LEVEL         = 55,
     // Descriptors: ///////////
     POS_DESCRIPTOR_START  = 56,
     POS_DESCRIPTOR_END    = 83,
     // Etc: ///////////////////
     POS_BLOODLINE_TEXT    = 84,
     POS_DOMAIN_TEXT       = 85,
-    POS_PATRON_TEXT       = 86,
-    POS_MYTHIC            = 87,
-    POS_MYTHIC_TEXT       = 88,
-    POS_AUGMENTED_TEXT    = 89,
-    POS_HAUNT_STAT_TEXT   = 90;
+    //POS_PATRON_TEXT       = 86,
+    POS_MYTHIC            = 87;
+    //POS_MYTHIC_TEXT       = 88,
+    //POS_AUGMENTED_TEXT    = 89,
+    /*POS_HAUNT_STAT_TEXT   = 90;*/
   // setup:
   int index = atoi(argv[POS_ID]) - 1;
   spell *ptr = (spell*)ext;
@@ -135,15 +135,16 @@ int  parse_spell (void *ext, int argc, str *argv, str *col) {
   process_spell_levels(ptr, &argv[POS_SPELL_LEVEL_START], &col[POS_SPELL_LEVEL_START], POS_SPELL_LEVEL_END - POS_SPELL_LEVEL_START);
 
   // CASTING SECTION:
-  ptr->_casting_time_id       = atoi(argv[POS_CASTING_TIME_ID]);
-  ptr->_components_text       = str_clone(argv[POS_COMPONENTS_TEXT]);
-  ptr->_components._verbal    = atoi(argv[POS_VERBAL]);
-  ptr->_components._somatic   = atoi(argv[POS_SOMATIC]);
-  ptr->_components._material  = atoi(argv[POS_MATERIAL]);
-  ptr->_components._focus     = atoi(argv[POS_FOCUS]);
-  ptr->_components._is_costly = atoi(argv[POS_MATERIAL_COSTLY]);
-  ptr->_components._cost      = (argv[POS_MATERIAL_COST]) ? atoi(argv[POS_MATERIAL_COST]) : 0;
-  ptr->_components._name      = NULL;
+  ptr->_casting_time_id          = atoi(argv[POS_CASTING_TIME_ID]);
+  ptr->_components_text          = str_clone(argv[POS_COMPONENTS_TEXT]);
+  ptr->_components._verbal       = atoi(argv[POS_VERBAL]);
+  ptr->_components._somatic      = atoi(argv[POS_SOMATIC]);
+  ptr->_components._material     = atoi(argv[POS_MATERIAL]);
+  ptr->_components._focus        = atoi(argv[POS_FOCUS]);
+  ptr->_components._divine_focus = atoi(argv[POS_DIVINE_FOCUS]);
+  ptr->_components._is_costly    = atoi(argv[POS_MATERIAL_COSTLY]);
+  ptr->_components._cost         = (argv[POS_MATERIAL_COST]) ? atoi(argv[POS_MATERIAL_COST]) : 0;
+  ptr->_components._name         = NULL;
 
   // EFFECT SECTION:
   ptr->_attributes._spell_resistance = 0;
