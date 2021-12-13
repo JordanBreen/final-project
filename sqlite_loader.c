@@ -5,11 +5,21 @@
 #include "sqlite_loader.h"
 #include "spell.h"
 
-sqlite3 *db = NULL;
-sqlite3_stmt *open_res = NULL;
-sqlite3_mutex *mutex = NULL;
-str db_file_name;
+sqlite3      *db           = NULL; // reference to "Pathfinder.db"
+sqlite3_stmt *open_res     = NULL; 
+str           db_file_name = NULL; // "Pathfinder.db"
 
+/*********************************************************************************
+ * name: load_table
+ * purp: loads all data in the specified table by the use of the passed callback function,
+ *       usually titled as "parse_*" found in their respective c files
+ * args: const str (char*) -- table_name     : the table name in "Pathfinder.db" to be read from
+ *       int(*)(...) -------- callback       : the parsing function unique to each object that invokes load_table()
+ *       size_t ------------- obj_size       : the byte size of the object that invokes load_table()
+ *       int* --------------- out_table_size : the size of the table, this reference is a static variable in the object's c file
+ * rtrn: the newly parsed data, to be cast to their respective type outside this function
+ * note: this function is called by each object's "init_*" function
+*/
 void* load_table (const str db_table_name, int(*callback)(void*, int, str*, str*), size_t obj_size, int* out_table_size) {
   void *storage;
   sqlite3_stmt *res = NULL;
@@ -32,6 +42,16 @@ void* load_table (const str db_table_name, int(*callback)(void*, int, str*, str*
   return storage;
 }
 
+/*********************************************************************************
+ * name: load_by_id
+ * purp: loads data from the target table at the specified id value
+ * args: const str (char*) -- table_name : the table name in "Pathfinder.db" to be read from
+ *       int(*)(...) -------- callback   : the parsing function unique to each object that invokes load_table()
+ *       size_t ------------- obj_size   : the byte size of the object that invokes load_table()
+ *       int ---------------- id         : the id value to be searched for and loaded in the target table
+ * rtrn: the newly parsed data, to be cast to their respective type outside this function
+ * note: currently, this function is called by spell::load_spell() exclusively
+*/
 void* load_by_id (const str db_table_name, int(*callback)(void*, int, str*, str*), size_t obj_size, int id) {
   void *storage;
   sqlite3_stmt *res = NULL;
@@ -61,25 +81,43 @@ void* load_by_id (const str db_table_name, int(*callback)(void*, int, str*, str*
   return storage;
 }
 
+/*********************************************************************************
+ * name: count_rows
+ * purp: callback function to get_table_size(), gets the number of rows in a table
+ * args: void* --------- ext  : "external", storage instatiated in get_table_size(), save here
+ *       int ----------- argc : number of columns in the queried data
+ *       str* (char**) - argv : array of strings holding string data of the current row
+ *       str* (char**) - col  : array of strings holding the queried data's column names
+ * rtrn: error code
+*/
 int count_rows (void *ext, int argc, str *argv, str *col) {
   int *size = (int*)ext;
   *size = atoi(*argv);
   return 0;
 }
 
+/*********************************************************************************
+ * name: db_close
+ * purp: closes the database cleanly, frees the memory of the error message if has any
+ * args: str (char*) -- err_msg : the error message
+ * rtrn: void
+*/
 void db_close (str err_msg) {
-  if(err_msg)
-    sqlite3_free(err_msg);
-  sqlite3_mutex_free(mutex);
+  if(err_msg) sqlite3_free(err_msg);
   free(db_file_name);
   sqlite3_close(db);
 }
 
+/*********************************************************************************
+ * name: db_open
+ * purp: opens the database and does error checking
+ * args: const str (char*) -- arg_db_file_name : the file name of the database
+ * rtrn: void
+*/
 void db_open (const str arg_db_file_name) {
   int ret_val = SQLITE_OK;
   str err_msg = NULL;
   db_file_name = str_clone(arg_db_file_name);
-  mutex = sqlite3_mutex_alloc(SQLITE_MUTEX_FAST);
   ret_val = sqlite3_open(db_file_name, &db);
   if(ret_val != SQLITE_OK) {
     fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
@@ -94,6 +132,13 @@ void db_open (const str arg_db_file_name) {
   }
 }
 
+/*********************************************************************************
+ * name: get_table_size
+ * purp: executes a query to get the number of rows in a table, uses the count_rows()
+ *       callback function to do this, provides error checking on its results
+ * args: str (char*) -- db_table_name : the name of the table to get the size of
+ * rtrn: the number of rows in the table 
+*/
 int get_table_size (const str db_table_name) {
   str err_msg  = NULL;
   int out_size = 0;
@@ -110,6 +155,13 @@ int get_table_size (const str db_table_name) {
   return out_size;
 }
 
+/*********************************************************************************
+ * name: str_clone
+ * purp: a utility function to copy strings to char pointers that are
+ *       not yet allocated any memory. Handles null cases.
+ * args: str (char*) -- arg_str : the string to be cloned
+ * rtrn: a newly allocated copy of the string value passed in
+*/
 str str_clone(str arg_str) {
   if(!arg_str)
     return NULL;

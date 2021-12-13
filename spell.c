@@ -85,7 +85,7 @@ void   process_SLA_level      (spell *ptr, str arg_str);
  *       str* (char**) - argv : array of strings holding string data of the current row
  *       str* (char**) - col  : array of strings holding the queried data's column names
  * rtrn: error code
- * note: passed to load_by_id by call in load_spell, otherwise obsured function
+ * note: passed to load_by_id by call in load_spell, otherwise obscured function
 */
 int parse_spell (void *ext, int argc, str *argv, str *col) {
   const int
