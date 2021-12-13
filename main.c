@@ -9,8 +9,11 @@
 #include "thread.h"
 #include "bit_def.h"
 
-const byte NUM_THREADS = 4;
-
+static const byte NUM_THREADS = 4;
+spell_id   spell_ids_to_load[] = {1, 5, 10, 15, 20};
+size_t     num_spell_ids_to_load = sizeof(spell_ids_to_load) / sizeof(*spell_ids_to_load);
+spell    **loaded_spells;
+size_t     num_loaded_spells = sizeof(spell_ids_to_load) / sizeof(*spell_ids_to_load);
 int main()
 {
   init_resources(NUM_THREADS);
@@ -19,12 +22,15 @@ int main()
   //print_classes();
   //printf("press any key to continue: ");
   //printf("%c\n", getc(stdin));
-  
+
+  load_spells(NUM_THREADS, spell_ids_to_load, num_spell_ids_to_load, &loaded_spells);
+  print_spells(loaded_spells, num_loaded_spells);
+  /*
   spell *test;
   for(int i = 1; i <= 2000; i++) {
    test = load_spell(i);
    free(test);
-  }
+  }*/
   /* time_unit testing
   time_block *tb = NULL;
   time_unit   tu = ROUND;

@@ -8,6 +8,10 @@ static byte num_threads;
 static pthread_barrier_t barrier;
 static pthread_mutex_t mutex;
 
+static void   *in_data  = NULL;
+static size_t  in_size  = 0;
+static void  **out_data = NULL;
+
 const byte MASTER = 0;
 
 struct thread {
@@ -94,6 +98,20 @@ void* _free_resources(void *ext) {
   return NULL;
 }
 
+void* _load_spells(void *ext) {
+  size_t   _num_tasks;
+  thread * _thread;
+  int      _task_index;
+  _num_tasks = in_size;
+  _thread    = (thread *) ext;
+  if(_thread->_id == MASTER)
+    set_num_tasks(_num_tasks);
+  pthread_barrier_wait(&barrier);
+  while ((_task_index = get_task()) != -1)
+    out_data[_task_index] = load_spell(*(((spell_id*)in_data)+_task_index));
+  return NULL;
+}
+
 void destroy_threads() {
   for (int i = 0; i < num_threads; i++) {
     if (i != MASTER)
@@ -102,6 +120,16 @@ void destroy_threads() {
   }
   pthread_barrier_destroy(&barrier);
   pthread_mutex_destroy(&mutex);
+}
+
+void set_in(void *arg_data, size_t arg_size) {
+  in_data = arg_data;
+  in_size = arg_size;
+}
+
+void reset_in() {
+  in_data = NULL;
+  in_size = 0;
 }
 
 void init_resources(byte arg_num_threads) {
@@ -118,11 +146,18 @@ void free_resources(byte arg_num_threads) {
   destroy_threads();
 }
 
-void load_spells(byte arg_num_threads) {
+void load_spells(byte arg_num_threads, spell_id *ids, size_t num_ids, spell ***spell_storage_ref) {
+  set_in(ids, num_ids);
+  out_data = malloc(num_ids * get_size_of_spell_ptr());
   db_open("Pathfinder.db");
   init_threads(arg_num_threads);
-  //process_threads(_init_resources);
+  process_threads(_load_spells);
   destroy_threads();
   db_close(NULL);
+  if (*spell_storage_ref)
+    free(*spell_storage_ref);
+  *spell_storage_ref = (spell**)out_data;
+  out_data = NULL;
+  reset_in();
 }
 

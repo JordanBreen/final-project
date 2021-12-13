@@ -34,7 +34,9 @@ typedef struct duration duration;
 
 typedef struct spell spell;
 
-extern spell *load_spell(spell_id);
+extern spell *load_spell (spell_id);
 extern void print_spell (spell*);
-
+extern void print_spells (spell**, size_t);
+extern size_t get_size_of_spell_ptr ();
+extern size_t get_size_of_spell ();
 #endif
