@@ -6,8 +6,8 @@
 #include "buf_def.h"
 
 const str
-  CASTING_HEADER = "- CASTING -",
-  EFFECT_HEADER = "- EFFECT -",
+  CASTING_HEADER     = "- CASTING -",
+  EFFECT_HEADER      = "- EFFECT -",
   DESCRIPTION_HEADER = "- DESCRIPTION -";
 
 struct spell_attributes {
@@ -33,7 +33,6 @@ struct spell_components {
 };
 
 struct spell {
-//type - identifier ------------ storage
   spell_id   _id            : SPELL_ID_BIT; // max 65,535 spells, expecting ~2,900 spells
   str        _name;
   school_id  _school_id     : SCHOOL_ID_BIT;
@@ -64,15 +63,20 @@ struct spell {
   str _bloodline_text;
   str _patron_text;
   str _mythic_text;
-  str _mythic_augment_text;
+  str _augmented_text;
+  str _haunt_stat_text;
   bit_16 _material_cost;
 };
 
-// private functions for readability, definitions below
-void process_descriptor_ids (spell *ptr, str *argv, str *col, int length);
-void process_spell_levels   (spell *ptr, str *argv, str *col, int length);
-void process_subschool_ids  (spell *ptr, str arg_str);
-void process_SLA_level      (spell *ptr, str arg_str);
+// private function declarations:
+int    parse_spell            (void *ext, int argc, str *argv, str *col);
+void   process_descriptor_ids (spell *ptr, str *argv, str *col, int length);
+void   process_spell_levels   (spell *ptr, str *argv, str *col, int length);
+void   process_subschool_ids  (spell *ptr, str arg_str);
+void   process_SLA_level      (spell *ptr, str arg_str);
+
+/** PARSER & LOADER **/
+
 /*********************************************************************************
  * name: parse_spell
  * purp: callback function to load_by_id() in sqlite_loader.c
@@ -126,11 +130,11 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
     // Etc: ///////////////////
     POS_BLOODLINE_TEXT    = 84,
     POS_DOMAIN_TEXT       = 85,
-    //POS_PATRON_TEXT       = 86,
-    POS_MYTHIC            = 87;
-    //POS_MYTHIC_TEXT       = 88,
-    //POS_AUGMENTED_TEXT    = 89,
-    /*POS_HAUNT_STAT_TEXT   = 90;*/
+    POS_PATRON_TEXT       = 86,
+    POS_MYTHIC            = 87,
+    POS_MYTHIC_TEXT       = 88,
+    POS_AUGMENTED_TEXT    = 89,
+    POS_HAUNT_STAT_TEXT   = 90;
   // setup:
   int index = atoi(argv[POS_ID]) - 1;
   spell *ptr = (spell*)ext;
@@ -158,23 +162,27 @@ int parse_spell (void *ext, int argc, str *argv, str *col) {
   ptr->_attributes._dismissable = atoi(argv[POS_DISMISSABLE]);
   ptr->_attributes._shapeable   = atoi(argv[POS_SHAPEABLE]);
   ptr->_attributes._mythic      = atoi(argv[POS_MYTHIC]);
-  ptr->_range_text        = str_clone(argv[POS_RANGE_TEXT]); // TEMP
-  ptr->_area_text         = str_clone(argv[POS_AREA_TEXT]);
-  ptr->_effect_text       = str_clone(argv[POS_EFFECT_TEXT]);
-  ptr->_target_text       = str_clone(argv[POS_TARGETS_TEXT]);
-  ptr->_duration_text     = str_clone(argv[POS_DURATION_TEXT]);
-  ptr->_saving_throw_text = str_clone(argv[POS_SAVING_THROW_TEXT]);
+  ptr->_range_text         = str_clone(argv[POS_RANGE_TEXT]); // TEMP
+  ptr->_area_text          = str_clone(argv[POS_AREA_TEXT]);
+  ptr->_effect_text        = str_clone(argv[POS_EFFECT_TEXT]);
+  ptr->_target_text        = str_clone(argv[POS_TARGETS_TEXT]);
+  ptr->_duration_text      = str_clone(argv[POS_DURATION_TEXT]);
+  ptr->_saving_throw_text  = str_clone(argv[POS_SAVING_THROW_TEXT]);
   // DESCRIPTION SECTION:
   ptr->_description_brief  = str_clone(argv[POS_DESCRIPTION_BRIEF]);
   ptr->_description_full   = str_clone(argv[POS_DESCRIPTION_FULL]);
   ptr->_description_format = str_clone(argv[POS_DESCRIPTION_FORM]);
   // ETC:
-  ptr->_full_text      = str_clone(argv[POS_FULL_TEXT]);
-  ptr->_link_text      = str_clone(argv[POS_LINK_TEXT]);
-  ptr->_source_text    = str_clone(argv[POS_SOURCE_TEXT]);
-  ptr->_deity_text     = str_clone(argv[POS_DEITY_TEXT]);
-  ptr->_domain_text    = str_clone(argv[POS_DOMAIN_TEXT]);
-  ptr->_bloodline_text = str_clone(argv[POS_BLOODLINE_TEXT]); 
+  ptr->_full_text          = str_clone(argv[POS_FULL_TEXT]);
+  ptr->_link_text          = str_clone(argv[POS_LINK_TEXT]);
+  ptr->_source_text        = str_clone(argv[POS_SOURCE_TEXT]);
+  ptr->_deity_text         = str_clone(argv[POS_DEITY_TEXT]);
+  ptr->_domain_text        = str_clone(argv[POS_DOMAIN_TEXT]);
+  ptr->_bloodline_text     = str_clone(argv[POS_BLOODLINE_TEXT]);
+  ptr->_patron_text        = str_clone(argv[POS_PATRON_TEXT]);
+  ptr->_mythic_text        = str_clone(argv[POS_MYTHIC_TEXT]);
+  ptr->_augmented_text     = str_clone(argv[POS_AUGMENTED_TEXT]);
+  ptr->_haunt_stat_text    = str_clone(argv[POS_HAUNT_STAT_TEXT]);
   return 0;
 }
 
@@ -256,7 +264,7 @@ void print_spell (spell *spell_ref) {
   if(spell_ref->_description_full)
     printf("%s\n", spell_ref->_description_full);
 
-  printf("\n");
+  printf("\n\n");
 }
 
 /**********************************************************************************
